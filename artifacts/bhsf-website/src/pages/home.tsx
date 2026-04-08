@@ -3,6 +3,7 @@ import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { Hero } from "@/components/sections/hero";
 import { Mission } from "@/components/sections/mission";
+import { SantoTomas } from "@/components/sections/santo-tomas";
 import { Programs } from "@/components/sections/programs";
 import { Impact } from "@/components/sections/impact";
 import { Donation } from "@/components/sections/donation";
@@ -15,6 +16,7 @@ export default function Home() {
       <main className="flex-1">
         <Hero />
         <Mission />
+        <SantoTomas />
         <Programs />
         <Impact />
         <Donation />

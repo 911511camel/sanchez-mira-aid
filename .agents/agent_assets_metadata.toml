@@ -24,3 +24,27 @@ id = "x-9gxIpsEJ-Z1tkd2r--m"
 uri = "file://artifacts/bhsf-website/src/assets/images/program-maternal.png"
 type = "image"
 title = "Maternal and child health care"
+
+[[generated]]
+id = "2Hhn6A125BL-xHCG4S6v-"
+uri = "file://artifacts/bhsf-website/src/assets/images/santo-tomas-landscape.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "xVCxM5mcJa3AVzYgYWtLx"
+uri = "file://artifacts/bhsf-website/src/assets/images/barangay-village.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "WWFO62rpvp3Rd_eaiZGW9"
+uri = "file://artifacts/bhsf-website/src/assets/images/community-gathering.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "wbLM3xV01ADxmu77qlXHx"
+uri = "file://artifacts/bhsf-website/src/assets/images/health-post.png"
+type = "image"
+title = "generated_image"
