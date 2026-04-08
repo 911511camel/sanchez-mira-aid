@@ -28,20 +28,51 @@ async function handleFiatDonation(
   lastName: string,
   email: string
 ) {
-  const donationId = crypto.randomUUID();
-  const addressIn = await getForwardingAddress(req, donationId);
-  if (!addressIn) {
-    res.status(502).json({ error: "Failed to generate payment address. Please try again." });
+  const apiKey = process.env.NOWPAYMENTS_API_KEY;
+  if (!apiKey) {
+    req.log.error("NOWPAYMENTS_API_KEY is not set");
+    res.status(500).json({ error: "Payment service not configured." });
     return;
   }
 
   const amountUsd = Math.max(+(amountPhp * PHP_TO_USD).toFixed(2), 1.0);
-  const checkoutUrl = `https://checkout.paygate.to/process-payment.php?address=${addressIn}&amount=${amountUsd}&provider=transak&email=${encodeURIComponent(email)}&currency=USD`;
+  const origin = (req.headers.origin ?? "").replace(/\/$/, "");
+  const successUrl = origin ? `${origin}/thank-you` : "https://nowpayments.io";
+  const cancelUrl  = origin ? `${origin}/#donate`    : "https://nowpayments.io";
 
-  pendingDonations.set(donationId, { amountPhp, name: `${firstName} ${lastName}` });
-  req.log.info({ donationId, amountPhp, amountUsd, addressIn }, "Fiat donation checkout created");
+  const nowPayRes = await fetch("https://api.nowpayments.io/v1/invoice", {
+    method: "POST",
+    headers: { "x-api-key": apiKey, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      price_amount: amountUsd,
+      price_currency: "usd",
+      pay_currency: "usdcmatic",
+      order_description: `BHSF Donation — PHP ${amountPhp} — ${firstName} ${lastName}`,
+      order_id: `BHSF-${Date.now()}`,
+      customer_email: email,
+      is_fixed_rate: true,
+      is_fee_paid_by_user: false,
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+    }),
+  });
 
-  res.json({ method: "fiat", checkoutUrl, donationId });
+  if (!nowPayRes.ok) {
+    const errBody = await nowPayRes.text();
+    req.log.error({ status: nowPayRes.status, body: errBody }, "NOWPayments error");
+    res.status(502).json({ error: "Payment provider error. Please try again." });
+    return;
+  }
+
+  const data = await nowPayRes.json() as { invoice_url?: string; id?: string };
+  if (!data.invoice_url) {
+    req.log.error({ data }, "NOWPayments returned no invoice_url");
+    res.status(502).json({ error: "Payment provider returned no checkout URL." });
+    return;
+  }
+
+  req.log.info({ amountPhp, amountUsd, email }, "Fiat donation invoice created via NOWPayments");
+  res.json({ method: "fiat", checkoutUrl: data.invoice_url, invoiceId: data.id });
 }
 
 async function handleCryptoDonation(
