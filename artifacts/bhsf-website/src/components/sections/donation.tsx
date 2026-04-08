@@ -473,7 +473,7 @@ function DonationForm({
       </Button>
 
       <p className="text-xs text-center text-muted-foreground">
-        {paymentMethod === "fiat" && "Redirects to PayGate.to secure checkout. Pay by card, GCash, or Maya. Settles as USDC to our Polygon wallet."}
+        {paymentMethod === "fiat" && "Redirects to HitPay secure checkout. Pay by card, GCash, Maya, or online banking."}
         {paymentMethod === "bank" && "You will see account details to transfer via GCash, Maya, Instapay, or online banking."}
         {paymentMethod === "crypto" && "You will receive a unique USDC (Polygon) address. Send from any compatible wallet via PayGate.to."}
       </p>
@@ -548,9 +548,11 @@ export function Donation() {
             <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/50 border border-border mb-4">
               <Shield size={20} className="text-secondary shrink-0" />
               <p className="text-sm text-muted-foreground">
-                Card and crypto payments via{" "}
-                <span className="font-semibold text-foreground">PayGate.to</span>.
-                All donations settle as USDC to our verified Polygon wallet.
+                Card payments via{" "}
+                <span className="font-semibold text-foreground">HitPay</span>.
+                Crypto donations via{" "}
+                <span className="font-semibold text-foreground">PayGate.to</span>,
+                settling as USDC to our verified Polygon wallet.
               </p>
             </div>
 

@@ -5,19 +5,35 @@ const router: IRouter = Router();
 
 const PAYOUT_WALLET = "0xB4c4F2DaeF5D2c0FDdd4b2c58F79EF1A1eB7A82a";
 const TICKER = "polygon/usdc";
-const PHP_TO_USD = 0.0175;
 
 const pendingDonations = new Map<string, { amountPhp: number; name: string; paidAt?: string }>();
 
-async function getForwardingAddress(req: Parameters<Parameters<IRouter["post"]>[1]>[0], donationId: string): Promise<string | null> {
-  const apiBase = process.env.API_PUBLIC_URL ?? `${req.protocol}://${req.get("host")}`;
-  const callbackUrl = `${apiBase}/api/donate/callback?id=${donationId}`;
-  const walletRes = await fetch(
-    `https://api.paygate.to/crypto/${TICKER}/wallet.php?address=${PAYOUT_WALLET}&callback=${encodeURIComponent(callbackUrl)}`
-  );
-  if (!walletRes.ok) return null;
-  const walletData = await walletRes.json() as { address_in?: string };
-  return walletData.address_in ?? null;
+// ---------------------------------------------------------------------------
+// HitPay helpers
+// ---------------------------------------------------------------------------
+
+const HITPAY_API_BASE = "https://api.hit-pay.com/v1";
+
+/**
+ * Build the HMAC signature expected by HitPay webhooks.
+ * Algorithm: for each key/value pair (excluding 'hmac'), concatenate as
+ * "<key><value>", sort alphabetically, join, then HMAC-SHA256 with the salt.
+ */
+function verifyHitPayWebhook(salt: string, payload: Record<string, string>, receivedHmac: string): boolean {
+  const filtered: Record<string, string> = {};
+  for (const [k, v] of Object.entries(payload)) {
+    if (k !== "hmac" && v !== "" && v !== null && v !== undefined) {
+      filtered[k] = v;
+    }
+  }
+
+  const parts = Object.entries(filtered)
+    .map(([k, v]) => `${k}${v}`)
+    .sort();
+
+  const sig = parts.join("");
+  const calculated = crypto.createHmac("sha256", salt).update(sig).digest("hex");
+  return crypto.timingSafeEqual(Buffer.from(calculated, "hex"), Buffer.from(receivedHmac, "hex"));
 }
 
 async function handleFiatDonation(
@@ -28,51 +44,71 @@ async function handleFiatDonation(
   lastName: string,
   email: string
 ) {
-  const apiKey = process.env.NOWPAYMENTS_API_KEY;
+  const apiKey = process.env.HITPAY_API_KEY;
   if (!apiKey) {
-    req.log.error("NOWPAYMENTS_API_KEY is not set");
+    req.log.error("HITPAY_API_KEY is not set");
     res.status(500).json({ error: "Payment service not configured." });
     return;
   }
 
-  const amountUsd = Math.max(+(amountPhp * PHP_TO_USD).toFixed(2), 1.0);
   const origin = (req.headers.origin ?? "").replace(/\/$/, "");
-  const successUrl = origin ? `${origin}/thank-you` : "https://nowpayments.io";
-  const cancelUrl  = origin ? `${origin}/#donate`    : "https://nowpayments.io";
+  const redirectUrl = origin ? `${origin}/thank-you` : `${req.protocol}://${req.get("host")}/thank-you`;
 
-  const nowPayRes = await fetch("https://api.nowpayments.io/v1/invoice", {
-    method: "POST",
-    headers: { "x-api-key": apiKey, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      price_amount: amountUsd,
-      price_currency: "usd",
-      pay_currency: "usdcmatic",
-      order_description: `BHSF Donation — PHP ${amountPhp} — ${firstName} ${lastName}`,
-      order_id: `BHSF-${Date.now()}`,
-      customer_email: email,
-      is_fixed_rate: true,
-      is_fee_paid_by_user: false,
-      success_url: successUrl,
-      cancel_url: cancelUrl,
-    }),
+  const referenceNumber = `BHSF-${Date.now()}`;
+
+  const params = new URLSearchParams({
+    amount: amountPhp.toFixed(2),
+    currency: "PHP",
+    email,
+    name: `${firstName} ${lastName}`,
+    purpose: `BHSF Donation — ₱${amountPhp}`,
+    reference_number: referenceNumber,
+    redirect_url: redirectUrl,
+    send_email: "false",
+    allow_repeated_payments: "false",
   });
 
-  if (!nowPayRes.ok) {
-    const errBody = await nowPayRes.text();
-    req.log.error({ status: nowPayRes.status, body: errBody }, "NOWPayments error");
+  const hitPayRes = await fetch(`${HITPAY_API_BASE}/payment-requests`, {
+    method: "POST",
+    headers: {
+      "X-BUSINESS-API-KEY": apiKey,
+      "Content-Type": "application/x-www-form-urlencoded",
+      "X-Requested-With": "XMLHttpRequest",
+    },
+    body: params.toString(),
+  });
+
+  if (!hitPayRes.ok) {
+    const errBody = await hitPayRes.text();
+    req.log.error({ status: hitPayRes.status, body: errBody }, "HitPay error");
     res.status(502).json({ error: "Payment provider error. Please try again." });
     return;
   }
 
-  const data = await nowPayRes.json() as { invoice_url?: string; id?: string };
-  if (!data.invoice_url) {
-    req.log.error({ data }, "NOWPayments returned no invoice_url");
+  const data = await hitPayRes.json() as { id?: string; url?: string; status?: string };
+  if (!data.url) {
+    req.log.error({ data }, "HitPay returned no checkout URL");
     res.status(502).json({ error: "Payment provider returned no checkout URL." });
     return;
   }
 
-  req.log.info({ amountPhp, amountUsd, email }, "Fiat donation invoice created via NOWPayments");
-  res.json({ method: "fiat", checkoutUrl: data.invoice_url, invoiceId: data.id });
+  req.log.info({ amountPhp, email, referenceNumber, paymentRequestId: data.id }, "Fiat donation payment request created via HitPay");
+  res.json({ method: "fiat", checkoutUrl: data.url, paymentRequestId: data.id, referenceNumber });
+}
+
+// ---------------------------------------------------------------------------
+// Crypto (PayGate.to) helpers
+// ---------------------------------------------------------------------------
+
+async function getForwardingAddress(req: Parameters<Parameters<IRouter["post"]>[1]>[0], donationId: string): Promise<string | null> {
+  const apiBase = process.env.API_PUBLIC_URL ?? `${req.protocol}://${req.get("host")}`;
+  const callbackUrl = `${apiBase}/api/donate/callback?id=${donationId}`;
+  const walletRes = await fetch(
+    `https://api.paygate.to/crypto/${TICKER}/wallet.php?address=${PAYOUT_WALLET}&callback=${encodeURIComponent(callbackUrl)}`
+  );
+  if (!walletRes.ok) return null;
+  const walletData = await walletRes.json() as { address_in?: string };
+  return walletData.address_in ?? null;
 }
 
 async function handleCryptoDonation(
@@ -126,6 +162,10 @@ async function handleCryptoDonation(
   });
 }
 
+// ---------------------------------------------------------------------------
+// Routes
+// ---------------------------------------------------------------------------
+
 router.post("/donate", async (req, res) => {
   const { amountPhp, firstName, lastName, email, paymentMethod } = req.body as {
     amountPhp: unknown;
@@ -157,6 +197,49 @@ router.post("/donate", async (req, res) => {
   }
 });
 
+/**
+ * HitPay webhook — receives POST (application/x-www-form-urlencoded) when a
+ * payment is completed or fails.
+ */
+router.post("/donate/hitpay-webhook", (req, res) => {
+  const salt = process.env.HITPAY_SALT;
+  if (!salt) {
+    req.log.error("HITPAY_SALT is not set — cannot verify webhook");
+    res.status(500).send("Webhook not configured");
+    return;
+  }
+
+  const payload = req.body as Record<string, string>;
+  const receivedHmac = payload.hmac ?? "";
+
+  if (!receivedHmac) {
+    req.log.warn("HitPay webhook received with no HMAC");
+    res.status(400).send("Missing HMAC");
+    return;
+  }
+
+  let valid = false;
+  try {
+    valid = verifyHitPayWebhook(salt, payload, receivedHmac);
+  } catch {
+    valid = false;
+  }
+
+  if (!valid) {
+    req.log.warn({ payload }, "HitPay webhook HMAC verification failed");
+    res.status(401).send("Invalid signature");
+    return;
+  }
+
+  const { status, payment_request_id, reference_number, amount, currency } = payload;
+  req.log.info({ status, payment_request_id, reference_number, amount, currency }, "HitPay webhook received");
+
+  res.status(200).send("OK");
+});
+
+/**
+ * PayGate.to callback for crypto donations.
+ */
 router.get("/donate/callback", (req, res) => {
   const { id, txid_out, value_coin } = req.query;
   req.log.info({ id, txid_out, value_coin }, "paygate.to callback received");
