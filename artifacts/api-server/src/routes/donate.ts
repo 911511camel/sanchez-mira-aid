@@ -3,9 +3,9 @@ import crypto from "crypto";
 
 const router: IRouter = Router();
 
-const PAYOUT_WALLET = "TPMUHFSebNNJfoeFiusq6TBypbsJy8DByw";
-const TICKER = "trc20/usdt";
-const MIN_USDT = 13.3;
+const PAYOUT_WALLET = "0xB4c4F2DaeF5D2c0FDdd4b2c58F79EF1A1eB7A82a";
+const TICKER = "polygon/usdc";
+const MIN_USDC = 1.0;
 const PHP_TO_USD = 0.0175;
 
 const pendingDonations = new Map<string, { amountPhp: number; name: string; paidAt?: string }>();
@@ -30,10 +30,10 @@ async function handleCryptoDonation(
     return;
   }
 
-  const amountUsdt = parseFloat(convertData.value_coin);
-  if (amountUsdt < MIN_USDT) {
+  const amountUsdc = parseFloat(convertData.value_coin);
+  if (amountUsdc < MIN_USDC) {
     res.status(400).json({
-      error: `Minimum for crypto is ~₱800 (${MIN_USDT} USDT). Use the Card/GCash option for smaller amounts.`,
+      error: `Minimum donation is ₱60 (~${MIN_USDC} USDC). Please increase your amount.`,
     });
     return;
   }
@@ -69,17 +69,17 @@ async function handleCryptoDonation(
   }
 
   pendingDonations.set(donationId, { amountPhp, name: `${firstName} ${lastName}` });
-  req.log.info({ donationId, amountPhp, address: walletData.address_in }, "Crypto donation created");
+  req.log.info({ donationId, amountPhp, amountUsdc, address: walletData.address_in }, "Crypto donation created");
 
   res.json({
     method: "crypto",
     donationId,
     addressIn: walletData.address_in,
-    amountUsdt: convertData.value_coin,
+    amountCoin: convertData.value_coin,
     exchangeRate: convertData.exchange_rate,
     qrCode,
-    network: "TRON (TRC-20)",
-    ticker: "USDT",
+    network: "Polygon",
+    ticker: "USDC",
   });
 }
 
@@ -114,7 +114,7 @@ async function handleFiatDonation(
     body: JSON.stringify({
       price_amount: finalAmount,
       price_currency: "usd",
-      pay_currency: "usdttrc20",
+      pay_currency: "usdcmatic",
       order_description: `BHSF Donation — PHP ${amountPhp} — ${firstName} ${lastName}`,
       order_id: `BHSF-${Date.now()}`,
       customer_email: email,
@@ -153,7 +153,7 @@ router.post("/donate", async (req, res) => {
   };
 
   const method = paymentMethod === "fiat" ? "fiat" : "crypto";
-  const minAmount = method === "crypto" ? 800 : 50;
+  const minAmount = 50;
 
   if (
     typeof amountPhp !== "number" || amountPhp < minAmount ||

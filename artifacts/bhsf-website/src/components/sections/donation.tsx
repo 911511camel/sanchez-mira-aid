@@ -19,25 +19,18 @@ import {
 
 type PaymentMethod = "fiat" | "crypto";
 
-const fiatTiers = [
+const donationTiers = [
   { amount: 250, impact: "Provides a month of vitamins for one child" },
   { amount: 500, impact: "Funds one home doctor visit" },
   { amount: 1000, impact: "Supplies a full medicine kit for a family" },
   { amount: 2500, impact: "Sponsors one mobile clinic day in a barangay" },
 ];
 
-const cryptoTiers = [
-  { amount: 1000, impact: "Supplies a full medicine kit for a family" },
-  { amount: 2500, impact: "Sponsors one mobile clinic day in a barangay" },
-  { amount: 5000, impact: "Funds a month of community health outreach" },
-  { amount: 10000, impact: "Provides essential equipment for a health post" },
-];
-
 interface CryptoPaymentDetails {
   method: "crypto";
   donationId: string;
   addressIn: string;
-  amountUsdt: string;
+  amountCoin: string;
   exchangeRate: string;
   qrCode: string | null;
   network: string;
@@ -67,6 +60,8 @@ function CryptoPaymentStep({
     }
   };
 
+  const explorerUrl = `https://polygonscan.com/address/${payment.addressIn}`;
+
   return (
     <motion.div
       key="crypto-payment"
@@ -89,16 +84,16 @@ function CryptoPaymentStep({
           ₱{amountPhp.toLocaleString()}
         </p>
         <p className="text-lg text-secondary font-semibold mt-1">
-          = {payment.amountUsdt} USDT
+          = {payment.amountCoin} {payment.ticker}
         </p>
         <p className="text-xs text-muted-foreground mt-1">
-          {payment.network} &bull; Rate: 1 USDT = ₱{(1 / parseFloat(payment.exchangeRate)).toFixed(2)}
+          {payment.network} &bull; Rate: 1 {payment.ticker} = ₱{(1 / parseFloat(payment.exchangeRate)).toFixed(2)}
         </p>
       </div>
 
       <div className="space-y-3">
         <p className="font-bold text-primary text-sm uppercase tracking-wider">
-          Send {payment.amountUsdt} USDT to this address:
+          Send {payment.amountCoin} {payment.ticker} to this address:
         </p>
 
         <div className="bg-muted/50 rounded-2xl border border-border p-4">
@@ -142,10 +137,10 @@ function CryptoPaymentStep({
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-900 space-y-1">
           <p className="font-semibold">Important</p>
           <ul className="list-disc list-inside space-y-1 text-amber-800">
-            <li>Send only <strong>USDT on TRON (TRC-20)</strong> network</li>
-            <li>Send the exact amount: <strong>{payment.amountUsdt} USDT</strong></li>
+            <li>Send only <strong>USDC on the Polygon network</strong></li>
+            <li>Send the exact amount: <strong>{payment.amountCoin} USDC</strong></li>
             <li>Funds are automatically forwarded to the BHSF wallet</li>
-            <li>Confirmations typically take 1–3 minutes</li>
+            <li>Polygon transactions confirm within seconds</li>
           </ul>
         </div>
       </div>
@@ -161,13 +156,13 @@ function CryptoPaymentStep({
 
       <div className="flex justify-center">
         <a
-          href={`https://tronscan.org/#/address/${payment.addressIn}`}
+          href={explorerUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors"
         >
           <ExternalLink size={12} />
-          View address on TRONSCAN
+          View address on Polygonscan
         </a>
       </div>
     </motion.div>
@@ -181,10 +176,7 @@ function DonationForm({
   paymentMethod: PaymentMethod;
   onSuccess: (data: CryptoPaymentDetails | null, amountPhp: number) => void;
 }) {
-  const tiers = paymentMethod === "fiat" ? fiatTiers : cryptoTiers;
-  const minAmount = paymentMethod === "fiat" ? 50 : 800;
-
-  const [selectedAmount, setSelectedAmount] = useState<number | "custom">(tiers[0].amount);
+  const [selectedAmount, setSelectedAmount] = useState<number | "custom">(donationTiers[0].amount);
   const [customAmount, setCustomAmount] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -196,14 +188,14 @@ function DonationForm({
   const currentImpact =
     selectedAmount === "custom"
       ? "Every contribution brings healthcare closer to those who need it."
-      : tiers.find((t) => t.amount === selectedAmount)?.impact;
+      : donationTiers.find((t) => t.amount === selectedAmount)?.impact;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    if (!amountPhp || amountPhp < minAmount) {
-      setError(`Please enter an amount of at least ₱${minAmount.toLocaleString()}.`);
+    if (!amountPhp || amountPhp < 50) {
+      setError("Please enter an amount of at least ₱50.");
       return;
     }
 
@@ -252,13 +244,12 @@ function DonationForm({
       className="space-y-8"
       data-testid="donation-form"
     >
-      {/* Amount Selection */}
       <div>
         <Label className="text-lg font-bold text-primary mb-4 block">
           Select Amount (PHP)
         </Label>
         <div className="grid grid-cols-2 gap-3 mb-3">
-          {tiers.map((tier) => (
+          {donationTiers.map((tier) => (
             <button
               key={tier.amount}
               type="button"
@@ -299,9 +290,9 @@ function DonationForm({
                 type="number"
                 value={customAmount}
                 onChange={(e) => setCustomAmount(e.target.value)}
-                placeholder={`Minimum ₱${minAmount.toLocaleString()}`}
+                placeholder="Minimum ₱50"
                 className="pl-8 h-14 text-lg rounded-xl"
-                min={minAmount}
+                min={50}
                 data-testid="input-custom-amount"
               />
             </div>
@@ -316,7 +307,6 @@ function DonationForm({
         )}
       </div>
 
-      {/* Personal Details */}
       <div className="space-y-4">
         <Label className="text-lg font-bold text-primary block">Your Details</Label>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -380,8 +370,8 @@ function DonationForm({
 
       <p className="text-xs text-center text-muted-foreground">
         {paymentMethod === "fiat"
-          ? "You will be redirected to a secure checkout. Pay by card, GCash, Maya, bank transfer, or PayPal. Funds settle to our verified USDT wallet."
-          : "You will receive a unique USDT wallet address to send from any crypto wallet. Minimum ₱1,000. Processed by PayGate.to."}
+          ? "You will be redirected to a secure checkout. Pay by card, GCash, Maya, bank transfer, or PayPal. Funds settle to our verified USDC wallet."
+          : "You will receive a unique USDC (Polygon) wallet address. Send from any compatible wallet. Fast, low-fee Polygon network. Processed by PayGate.to."}
       </p>
     </motion.form>
   );
@@ -441,7 +431,7 @@ export function Donation() {
                 The Impact of Your Gift
               </h3>
               <ul className="space-y-4">
-                {fiatTiers.map((tier) => (
+                {donationTiers.map((tier) => (
                   <li key={tier.amount} className="flex gap-3">
                     <span className="font-bold text-primary whitespace-nowrap min-w-[100px]">
                       ₱{tier.amount.toLocaleString()}
@@ -459,7 +449,7 @@ export function Donation() {
                 <span className="font-semibold text-foreground">NOWPayments</span>{" "}
                 and crypto via{" "}
                 <span className="font-semibold text-foreground">PayGate.to</span>.
-                All donations settle as USDT to our verified TRC-20 fund wallet.
+                All donations settle as USDC to our verified Polygon wallet.
               </p>
             </div>
 
@@ -470,7 +460,7 @@ export function Donation() {
                 { label: "Credit Card", desc: "via card tab" },
                 { label: "PayPal", desc: "via card tab" },
                 { label: "Bank Transfer", desc: "via card tab" },
-                { label: "USDT (TRC-20)", desc: "via crypto tab" },
+                { label: "USDC (Polygon)", desc: "via crypto tab" },
               ].map((p) => (
                 <div
                   key={p.label}
@@ -488,7 +478,6 @@ export function Donation() {
             <Card className="border-0 shadow-2xl rounded-3xl overflow-hidden bg-white">
               <CardContent className="p-8 md:p-10">
 
-                {/* Payment Method Toggle — only show when on form step */}
                 {step === "form" && (
                   <div className="flex rounded-2xl border border-border bg-muted/30 p-1 mb-8 gap-1">
                     <button
@@ -515,7 +504,7 @@ export function Donation() {
                       data-testid="tab-crypto"
                     >
                       <Bitcoin size={17} />
-                      Crypto (USDT)
+                      Crypto (USDC)
                     </button>
                   </div>
                 )}

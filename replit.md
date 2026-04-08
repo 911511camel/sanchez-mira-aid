@@ -21,11 +21,11 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 ### Barangay Health Support Fund (`artifacts/bhsf-website`)
 - React + Vite fundraising website
 - Sections: Hero, Mission, Programs, Impact, Donation, Contact, Footer
-- **Dual payment system** — all donations settle to USDT TRC-20 wallet `TPMUHFSebNNJfoeFiusq6TBypbsJy8DByw`
-- **Fiat tab** (Card / GCash / Maya / Bank / PayPal): NOWPayments hosted checkout, min ₱50, tiers ₱250/₱500/₱1,000/₱2,500, requires `NOWPAYMENTS_API_KEY` secret
-- **Crypto tab** (USDT TRC-20): PayGate.to self-hosted checkout (no API key), min ₱800, tiers ₱1,000/₱2,500/₱5,000/₱10,000
+- **Dual payment system** — all donations settle to USDC Polygon wallet `0xB4c4F2DaeF5D2c0FDdd4b2c58F79EF1A1eB7A82a`
+- **Fiat tab** (Card / GCash / Maya / Bank / PayPal): NOWPayments hosted checkout, min ₱50, tiers ₱250/₱500/₱1,000/₱2,500, settles `usdcmatic`, requires `NOWPAYMENTS_API_KEY` secret
+- **Crypto tab** (USDC Polygon): PayGate.to self-hosted checkout (no API key), min ₱50, same tiers, generates Polygon forwarding address
 - Fiat flow: form → POST `/api/donate` (paymentMethod:"fiat") → NOWPayments invoice → redirect to hosted checkout
-- Crypto flow: form → POST `/api/donate` (paymentMethod:"crypto") → PayGate.to generates TRON address → show address + QR in-page
+- Crypto flow: form → POST `/api/donate` (paymentMethod:"crypto") → PayGate.to generates Polygon forwarding address → show address + QR in-page
 - Callback endpoint: `GET /api/donate/callback` — called by PayGate.to on crypto payment confirmation
 
 ### API Server (`artifacts/api-server`)
