@@ -12,7 +12,6 @@ import {
   Copy,
   CheckCircle,
   ArrowLeft,
-  ExternalLink,
   CreditCard,
   Bitcoin,
   Landmark,
@@ -29,141 +28,6 @@ const donationTiers = [
 
 const BANK_RECEIVER = "Philippines Inc";
 const BANK_ACCOUNT  = "2005895445";
-
-interface CryptoPaymentDetails {
-  method: "crypto" | "fiat";
-  donationId: string;
-  addressIn?: string;
-  amountCoin?: string;
-  exchangeRate?: string;
-  qrCode?: string | null;
-  network?: string;
-  ticker?: string;
-  checkoutUrl?: string;
-}
-
-function CryptoPaymentStep({
-  amountPhp,
-  payment,
-  onBack,
-  onDone,
-}: {
-  amountPhp: number;
-  payment: CryptoPaymentDetails;
-  onBack: () => void;
-  onDone: () => void;
-}) {
-  const [copied, setCopied] = useState(false);
-
-  const copyAddress = async () => {
-    if (!payment.addressIn) return;
-    try {
-      await navigator.clipboard.writeText(payment.addressIn);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 3000);
-    } catch { /* ignore */ }
-  };
-
-  const explorerUrl = `https://polygonscan.com/address/${payment.addressIn}`;
-
-  return (
-    <motion.div
-      key="crypto-payment"
-      initial={{ opacity: 0, x: 40 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -40 }}
-      className="space-y-6"
-    >
-      <button
-        onClick={onBack}
-        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
-      >
-        <ArrowLeft size={16} />
-        Change amount
-      </button>
-
-      <div className="text-center pb-4 border-b border-border">
-        <p className="text-sm text-muted-foreground mb-1">Sending donation of</p>
-        <p className="text-4xl font-bold text-primary">₱{amountPhp.toLocaleString()}</p>
-        <p className="text-lg text-secondary font-semibold mt-1">
-          = {payment.amountCoin} {payment.ticker}
-        </p>
-        <p className="text-xs text-muted-foreground mt-1">
-          {payment.network} &bull; Rate: 1 {payment.ticker} = ₱{(1 / parseFloat(payment.exchangeRate ?? "1")).toFixed(2)}
-        </p>
-      </div>
-
-      <div className="space-y-3">
-        <p className="font-bold text-primary text-sm uppercase tracking-wider">
-          Send {payment.amountCoin} {payment.ticker} to this address:
-        </p>
-
-        <div className="bg-muted/50 rounded-2xl border border-border p-4">
-          <p className="font-mono text-sm break-all text-foreground leading-relaxed mb-3 select-all">
-            {payment.addressIn}
-          </p>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={copyAddress}
-            className="w-full gap-2 rounded-xl"
-          >
-            {copied ? (
-              <><CheckCircle size={16} className="text-green-600" /><span className="text-green-600">Address Copied</span></>
-            ) : (
-              <><Copy size={16} />Copy Address</>
-            )}
-          </Button>
-        </div>
-
-        {payment.qrCode && (
-          <div className="flex justify-center">
-            <div className="bg-white p-4 rounded-2xl border border-border inline-block">
-              <img
-                src={`data:image/png;base64,${payment.qrCode}`}
-                alt="Payment QR Code"
-                className="w-40 h-40"
-              />
-              <p className="text-xs text-center text-muted-foreground mt-2">Scan with your wallet app</p>
-            </div>
-          </div>
-        )}
-
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-900 space-y-1">
-          <p className="font-semibold">Important</p>
-          <ul className="list-disc list-inside space-y-1 text-amber-800">
-            <li>Send only <strong>USDC on the Polygon network</strong></li>
-            <li>Send the exact amount: <strong>{payment.amountCoin} USDC</strong></li>
-            <li>Funds are automatically forwarded to the BHSF wallet</li>
-            <li>Polygon transactions confirm within seconds</li>
-          </ul>
-        </div>
-      </div>
-
-      <Button
-        type="button"
-        onClick={onDone}
-        className="w-full h-14 text-lg rounded-2xl bg-accent hover:bg-accent/90 text-accent-foreground font-bold shadow-xl gap-2"
-      >
-        <CheckCircle size={20} />
-        I Have Sent the Payment
-      </Button>
-
-      <div className="flex justify-center">
-        <a
-          href={explorerUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors"
-        >
-          <ExternalLink size={12} />
-          View address on Polygonscan
-        </a>
-      </div>
-    </motion.div>
-  );
-}
 
 function BankTransferDetails({ amountPhp, onBack }: { amountPhp: number; onBack: () => void }) {
   const [copiedAcc, setCopiedAcc] = useState(false);
@@ -273,11 +137,9 @@ function BankTransferDetails({ amountPhp, onBack }: { amountPhp: number; onBack:
 
 function DonationForm({
   paymentMethod,
-  onSuccess,
   onBank,
 }: {
   paymentMethod: PaymentMethod;
-  onSuccess: (data: CryptoPaymentDetails, amountPhp: number) => void;
   onBank: (amountPhp: number) => void;
 }) {
   const [selectedAmount, setSelectedAmount] = useState<number | "custom">(donationTiers[0].amount);
@@ -316,14 +178,14 @@ function DonationForm({
         body: JSON.stringify({ amountPhp, firstName, lastName, email, paymentMethod }),
       });
 
-      const data = await res.json();
+      const data = await res.json() as { checkoutUrl?: string; error?: string };
 
       if (!res.ok) throw new Error(data.error ?? "Payment could not be created. Please try again.");
 
-      if (data.method === "fiat" && data.checkoutUrl) {
+      if (data.checkoutUrl) {
         window.location.href = data.checkoutUrl;
       } else {
-        onSuccess(data as CryptoPaymentDetails, amountPhp);
+        throw new Error("No checkout URL returned. Please try again.");
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
@@ -341,6 +203,10 @@ function DonationForm({
   })();
 
   const requiresPersonalDetails = paymentMethod !== "bank";
+
+  const redirectingLabel = paymentMethod === "fiat"
+    ? "Redirecting to HitPay…"
+    : "Opening NOWPayments checkout…";
 
   return (
     <motion.form
@@ -467,15 +333,17 @@ function DonationForm({
         {isSubmitting ? (
           <span className="flex items-center gap-3">
             <Loader2 className="animate-spin" size={22} />
-            {paymentMethod === "fiat" ? "Redirecting to checkout…" : "Generating payment address…"}
+            {redirectingLabel}
           </span>
-        ) : paymentMethod === "bank" ? `View Bank Details — ${donateLabel.replace("Donate", "₱")}` : donateLabel}
+        ) : paymentMethod === "bank"
+          ? `View Bank Details — ${donateLabel.replace("Donate ", "")}`
+          : donateLabel}
       </Button>
 
       <p className="text-xs text-center text-muted-foreground">
         {paymentMethod === "fiat" && "Redirects to HitPay secure checkout. Pay by card, GCash, Maya, or online banking."}
         {paymentMethod === "bank" && "You will see account details to transfer via GCash, Maya, Instapay, or online banking."}
-        {paymentMethod === "crypto" && "You will receive a unique USDC (Polygon) address. Send from any compatible wallet via PayGate.to."}
+        {paymentMethod === "crypto" && "Redirects to NOWPayments secure checkout. Pay with Bitcoin, Ethereum, USDT, USDC, and 100+ other cryptocurrencies."}
       </p>
     </motion.form>
   );
@@ -483,15 +351,8 @@ function DonationForm({
 
 export function Donation() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("fiat");
-  const [step, setStep] = useState<"form" | "crypto-payment" | "bank-transfer">("form");
-  const [cryptoPayment, setCryptoPayment] = useState<CryptoPaymentDetails | null>(null);
+  const [step, setStep] = useState<"form" | "bank-transfer">("form");
   const [donationAmountPhp, setDonationAmountPhp] = useState(0);
-
-  const handleFormSuccess = (data: CryptoPaymentDetails, amountPhp: number) => {
-    setCryptoPayment(data);
-    setDonationAmountPhp(amountPhp);
-    setStep("crypto-payment");
-  };
 
   const handleBank = (amountPhp: number) => {
     setDonationAmountPhp(amountPhp);
@@ -500,13 +361,11 @@ export function Donation() {
 
   const handleBack = () => {
     setStep("form");
-    setCryptoPayment(null);
   };
 
   const handleMethodChange = (method: PaymentMethod) => {
     setPaymentMethod(method);
     setStep("form");
-    setCryptoPayment(null);
   };
 
   return (
@@ -549,10 +408,10 @@ export function Donation() {
               <Shield size={20} className="text-secondary shrink-0" />
               <p className="text-sm text-muted-foreground">
                 Card payments via{" "}
-                <span className="font-semibold text-foreground">HitPay</span>.
+                <span className="font-semibold text-foreground">HitPay</span>.{" "}
                 Crypto donations via{" "}
-                <span className="font-semibold text-foreground">PayGate.to</span>,
-                settling as USDC to our verified Polygon wallet.
+                <span className="font-semibold text-foreground">NOWPayments</span>,
+                supporting 100+ cryptocurrencies worldwide.
               </p>
             </div>
 
@@ -562,8 +421,8 @@ export function Donation() {
                 { label: "Credit / Debit Card", desc: "via card tab" },
                 { label: "Bank Transfer", desc: "via bank tab" },
                 { label: "Instapay / PESONet", desc: "via bank tab" },
-                { label: "USDC (Polygon)", desc: "via crypto tab" },
-                { label: "PayPal / ApplePay", desc: "via card tab" },
+                { label: "Bitcoin / Ethereum", desc: "via crypto tab" },
+                { label: "USDT / USDC / 100+", desc: "via crypto tab" },
               ].map((p) => (
                 <div
                   key={p.label}
@@ -609,24 +468,14 @@ export function Donation() {
                 <AnimatePresence mode="wait">
                   {step === "form" && (
                     <DonationForm
-                      key={paymentMethod}
+                      key="donation-form"
                       paymentMethod={paymentMethod}
-                      onSuccess={handleFormSuccess}
                       onBank={handleBank}
                     />
                   )}
-
-                  {step === "crypto-payment" && cryptoPayment && (
-                    <CryptoPaymentStep
-                      amountPhp={donationAmountPhp}
-                      payment={cryptoPayment}
-                      onBack={handleBack}
-                      onDone={() => (window.location.href = "/thank-you")}
-                    />
-                  )}
-
                   {step === "bank-transfer" && (
                     <BankTransferDetails
+                      key="bank-transfer"
                       amountPhp={donationAmountPhp}
                       onBack={handleBack}
                     />

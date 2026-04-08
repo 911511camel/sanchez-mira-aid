@@ -3,22 +3,12 @@ import crypto from "crypto";
 
 const router: IRouter = Router();
 
-const PAYOUT_WALLET = "0xB4c4F2DaeF5D2c0FDdd4b2c58F79EF1A1eB7A82a";
-const TICKER = "polygon/usdc";
-
-const pendingDonations = new Map<string, { amountPhp: number; name: string; paidAt?: string }>();
-
 // ---------------------------------------------------------------------------
 // HitPay helpers
 // ---------------------------------------------------------------------------
 
 const HITPAY_API_BASE = "https://api.hit-pay.com/v1";
 
-/**
- * Build the HMAC signature expected by HitPay webhooks.
- * Algorithm: for each key/value pair (excluding 'hmac'), concatenate as
- * "<key><value>", sort alphabetically, join, then HMAC-SHA256 with the salt.
- */
 function verifyHitPayWebhook(salt: string, payload: Record<string, string>, receivedHmac: string): boolean {
   const filtered: Record<string, string> = {};
   for (const [k, v] of Object.entries(payload)) {
@@ -97,69 +87,69 @@ async function handleFiatDonation(
 }
 
 // ---------------------------------------------------------------------------
-// Crypto (PayGate.to) helpers
+// NOWPayments (crypto) helpers
 // ---------------------------------------------------------------------------
 
-async function getForwardingAddress(req: Parameters<Parameters<IRouter["post"]>[1]>[0], donationId: string): Promise<string | null> {
-  const apiBase = process.env.API_PUBLIC_URL ?? `${req.protocol}://${req.get("host")}`;
-  const callbackUrl = `${apiBase}/api/donate/callback?id=${donationId}`;
-  const walletRes = await fetch(
-    `https://api.paygate.to/crypto/${TICKER}/wallet.php?address=${PAYOUT_WALLET}&callback=${encodeURIComponent(callbackUrl)}`
-  );
-  if (!walletRes.ok) return null;
-  const walletData = await walletRes.json() as { address_in?: string };
-  return walletData.address_in ?? null;
-}
+const NOWPAYMENTS_API_BASE = "https://api.nowpayments.io/v1";
 
 async function handleCryptoDonation(
   req: Parameters<Parameters<IRouter["post"]>[1]>[0],
   res: Parameters<Parameters<IRouter["post"]>[1]>[1],
   amountPhp: number,
   firstName: string,
-  lastName: string
+  lastName: string,
+  email: string
 ) {
-  const convertRes = await fetch(
-    `https://api.paygate.to/crypto/${TICKER}/convert.php?from=PHP&value=${amountPhp}`
-  );
-  if (!convertRes.ok) {
-    res.status(502).json({ error: "Currency conversion failed. Please try again." });
-    return;
-  }
-  const convertData = await convertRes.json() as { status: string; value_coin: string; exchange_rate: string };
-  if (convertData.status !== "success") {
-    res.status(502).json({ error: "Currency conversion failed." });
+  const apiKey = process.env.NOWPAYMENTS_API_KEY;
+  if (!apiKey) {
+    req.log.error("NOWPAYMENTS_API_KEY is not set");
+    res.status(500).json({ error: "Crypto payment service not configured." });
     return;
   }
 
-  const donationId = crypto.randomUUID();
-  const addressIn = await getForwardingAddress(req, donationId);
-  if (!addressIn) {
-    res.status(502).json({ error: "Failed to generate payment address. Please try again." });
-    return;
-  }
+  const origin = (req.headers.origin ?? "").replace(/\/$/, "");
+  const successUrl = origin ? `${origin}/thank-you` : `${req.protocol}://${req.get("host")}/thank-you`;
+  const cancelUrl  = origin ? `${origin}/#donate`    : `${req.protocol}://${req.get("host")}/#donate`;
+  const ipnCallbackUrl = `${process.env.API_PUBLIC_URL ?? `${req.protocol}://${req.get("host")}`}/api/donate/nowpayments-ipn`;
 
-  const qrRes = await fetch(
-    `https://api.paygate.to/crypto/${TICKER}/qrcode.php?address=${addressIn}`
-  );
-  let qrCode: string | null = null;
-  if (qrRes.ok) {
-    const qrData = await qrRes.json() as { status: string; qr_code?: string };
-    if (qrData.status === "success" && qrData.qr_code) qrCode = qrData.qr_code;
-  }
+  const orderDescription = `BHSF Donation — ₱${amountPhp} from ${firstName} ${lastName}`;
+  const orderReference   = `BHSF-${Date.now()}`;
 
-  pendingDonations.set(donationId, { amountPhp, name: `${firstName} ${lastName}` });
-  req.log.info({ donationId, amountPhp, address: addressIn }, "Crypto donation created");
+  const body = {
+    price_amount:      amountPhp,
+    price_currency:    "php",
+    order_description: orderDescription,
+    order_id:          orderReference,
+    ipn_callback_url:  ipnCallbackUrl,
+    success_url:       successUrl,
+    cancel_url:        cancelUrl,
+  };
 
-  res.json({
-    method: "crypto",
-    donationId,
-    addressIn,
-    amountCoin: convertData.value_coin,
-    exchangeRate: convertData.exchange_rate,
-    qrCode,
-    network: "Polygon",
-    ticker: "USDC",
+  const npRes = await fetch(`${NOWPAYMENTS_API_BASE}/invoice`, {
+    method: "POST",
+    headers: {
+      "x-api-key":    apiKey,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
   });
+
+  if (!npRes.ok) {
+    const errBody = await npRes.text();
+    req.log.error({ status: npRes.status, body: errBody }, "NOWPayments invoice error");
+    res.status(502).json({ error: "Crypto payment provider error. Please try again." });
+    return;
+  }
+
+  const data = await npRes.json() as { id?: string; invoice_url?: string; token_id?: string };
+  if (!data.invoice_url) {
+    req.log.error({ data }, "NOWPayments returned no invoice URL");
+    res.status(502).json({ error: "Crypto payment provider returned no checkout URL." });
+    return;
+  }
+
+  req.log.info({ amountPhp, email, orderReference, invoiceId: data.id }, "Crypto donation invoice created via NOWPayments");
+  res.json({ method: "crypto", checkoutUrl: data.invoice_url, invoiceId: data.id, orderReference });
 }
 
 // ---------------------------------------------------------------------------
@@ -188,8 +178,10 @@ router.post("/donate", async (req, res) => {
   try {
     if (paymentMethod === "fiat") {
       await handleFiatDonation(req, res, amountPhp, firstName.trim(), lastName.trim(), email);
+    } else if (paymentMethod === "crypto") {
+      await handleCryptoDonation(req, res, amountPhp, firstName.trim(), lastName.trim(), email);
     } else {
-      await handleCryptoDonation(req, res, amountPhp, firstName.trim(), lastName.trim());
+      res.status(400).json({ error: "Invalid payment method." });
     }
   } catch (err) {
     req.log.error({ err }, "Failed to create donation");
@@ -198,8 +190,7 @@ router.post("/donate", async (req, res) => {
 });
 
 /**
- * HitPay webhook — receives POST (application/x-www-form-urlencoded) when a
- * payment is completed or fails.
+ * HitPay webhook — application/x-www-form-urlencoded
  */
 router.post("/donate/hitpay-webhook", (req, res) => {
   const salt = process.env.HITPAY_SALT;
@@ -238,17 +229,37 @@ router.post("/donate/hitpay-webhook", (req, res) => {
 });
 
 /**
- * PayGate.to callback for crypto donations.
+ * NOWPayments IPN callback — JSON payload sent when a crypto payment is
+ * completed, partially paid, or expires.
  */
-router.get("/donate/callback", (req, res) => {
-  const { id, txid_out, value_coin } = req.query;
-  req.log.info({ id, txid_out, value_coin }, "paygate.to callback received");
-  if (typeof id === "string" && pendingDonations.has(id)) {
-    const d = pendingDonations.get(id)!;
-    d.paidAt = new Date().toISOString();
-    pendingDonations.set(id, d);
+router.post("/donate/nowpayments-ipn", (req, res) => {
+  const ipnSecret = process.env.NOWPAYMENTS_IPN_SECRET;
+
+  if (ipnSecret) {
+    const receivedSig = req.headers["x-nowpayments-sig"] as string | undefined;
+    if (receivedSig) {
+      const payload = req.body as Record<string, unknown>;
+      const sorted  = JSON.stringify(
+        Object.fromEntries(Object.entries(payload).sort(([a], [b]) => a.localeCompare(b)))
+      );
+      const expected = crypto.createHmac("sha512", ipnSecret).update(sorted).digest("hex");
+      if (!crypto.timingSafeEqual(Buffer.from(expected, "hex"), Buffer.from(receivedSig, "hex"))) {
+        req.log.warn("NOWPayments IPN signature mismatch");
+        res.status(401).send("Invalid signature");
+        return;
+      }
+    }
   }
-  res.status(200).send("*ok*");
+
+  const { payment_id, payment_status, order_id, price_amount, price_currency, pay_amount, pay_currency } =
+    req.body as Record<string, unknown>;
+
+  req.log.info(
+    { payment_id, payment_status, order_id, price_amount, price_currency, pay_amount, pay_currency },
+    "NOWPayments IPN received"
+  );
+
+  res.status(200).send("OK");
 });
 
 export default router;
