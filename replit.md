@@ -16,6 +16,20 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - **API codegen**: Orval (from OpenAPI spec)
 - **Build**: esbuild (CJS bundle)
 
+## Artifacts
+
+### Barangay Health Support Fund (`artifacts/bhsf-website`)
+- React + Vite fundraising website
+- Sections: Hero, Mission, Programs, Impact, Donation, Contact, Footer
+- Real payment integration via **NOWPayments** — donations settle to USDT TRC-20 wallet `TPMUHFSebNNJfoeFiusq6TBypbsJy8DByw`
+- Donation flow: fill form → POST `/api/donate` → redirects to NOWPayments checkout → donor pays → NOWPayments settles USDT
+- `NOWPAYMENTS_API_KEY` must be set in secrets
+- **Important**: set your USDT payout wallet in NOWPayments dashboard → Settings → Store Settings → Payout Wallet
+
+### API Server (`artifacts/api-server`)
+- Express 5 backend
+- `POST /api/donate` — creates NOWPayments invoice, returns `{ checkoutUrl, invoiceId }`
+
 ## Key Commands
 
 - `pnpm run typecheck` — full typecheck across all packages
