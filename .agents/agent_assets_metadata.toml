@@ -1,0 +1,26 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "JcXMdyYbzdpahB8vqHHDa"
+uri = "file://artifacts/bhsf-website/src/assets/images/hero.png"
+type = "image"
+title = "Hero image doctor reassuring family"
+
+[[generated]]
+id = "h2MfEgzWeQ-PDjWyjFGBk"
+uri = "file://artifacts/bhsf-website/src/assets/images/program-medicine.png"
+type = "image"
+title = "Essential medicines for rural families"
+
+[[generated]]
+id = "zOyqzTvHjBNzCsG3IurSl"
+uri = "file://artifacts/bhsf-website/src/assets/images/program-mobile.png"
+type = "image"
+title = "Mobile doctor visiting remote barangay"
+
+[[generated]]
+id = "x-9gxIpsEJ-Z1tkd2r--m"
+uri = "file://artifacts/bhsf-website/src/assets/images/program-maternal.png"
+type = "image"
+title = "Maternal and child health care"
