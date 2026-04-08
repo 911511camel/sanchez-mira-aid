@@ -4,16 +4,37 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Heart, Shield, AlertCircle, Loader2, Copy, CheckCircle, ArrowLeft, ExternalLink } from "lucide-react";
+import {
+  Heart,
+  Shield,
+  AlertCircle,
+  Loader2,
+  Copy,
+  CheckCircle,
+  ArrowLeft,
+  ExternalLink,
+  CreditCard,
+  Bitcoin,
+} from "lucide-react";
 
-const tiers = [
-  { amount: 1000, usd: 17, impact: "Supplies a full medicine kit for a family" },
-  { amount: 2500, usd: 42, impact: "Sponsors one mobile clinic day in a barangay" },
-  { amount: 5000, usd: 84, impact: "Funds a month of community health outreach" },
-  { amount: 10000, usd: 168, impact: "Provides essential equipment for a health post" },
+type PaymentMethod = "fiat" | "crypto";
+
+const fiatTiers = [
+  { amount: 250, impact: "Provides a month of vitamins for one child" },
+  { amount: 500, impact: "Funds one home doctor visit" },
+  { amount: 1000, impact: "Supplies a full medicine kit for a family" },
+  { amount: 2500, impact: "Sponsors one mobile clinic day in a barangay" },
 ];
 
-interface PaymentDetails {
+const cryptoTiers = [
+  { amount: 1000, impact: "Supplies a full medicine kit for a family" },
+  { amount: 2500, impact: "Sponsors one mobile clinic day in a barangay" },
+  { amount: 5000, impact: "Funds a month of community health outreach" },
+  { amount: 10000, impact: "Provides essential equipment for a health post" },
+];
+
+interface CryptoPaymentDetails {
+  method: "crypto";
   donationId: string;
   addressIn: string;
   amountUsdt: string;
@@ -23,14 +44,14 @@ interface PaymentDetails {
   ticker: string;
 }
 
-function PaymentStep({
+function CryptoPaymentStep({
   amountPhp,
   payment,
   onBack,
   onDone,
 }: {
   amountPhp: number;
-  payment: PaymentDetails;
+  payment: CryptoPaymentDetails;
   onBack: () => void;
   onDone: () => void;
 }) {
@@ -42,29 +63,27 @@ function PaymentStep({
       setCopied(true);
       setTimeout(() => setCopied(false), 3000);
     } catch {
-      /* fallback: select text */
+      /* ignore */
     }
   };
 
   return (
     <motion.div
-      key="payment"
+      key="crypto-payment"
       initial={{ opacity: 0, x: 40 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -40 }}
       className="space-y-6"
     >
-      <div className="flex items-center gap-3 mb-2">
-        <button
-          onClick={onBack}
-          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
-        >
-          <ArrowLeft size={16} />
-          Change amount
-        </button>
-      </div>
+      <button
+        onClick={onBack}
+        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+      >
+        <ArrowLeft size={16} />
+        Change amount
+      </button>
 
-      <div className="text-center pb-2 border-b border-border">
+      <div className="text-center pb-4 border-b border-border">
         <p className="text-sm text-muted-foreground mb-1">Sending donation of</p>
         <p className="text-4xl font-bold text-primary">
           ₱{amountPhp.toLocaleString()}
@@ -73,13 +92,13 @@ function PaymentStep({
           = {payment.amountUsdt} USDT
         </p>
         <p className="text-xs text-muted-foreground mt-1">
-          Network: {payment.network} &bull; Rate: 1 USDT = ₱{(1 / parseFloat(payment.exchangeRate)).toFixed(2)}
+          {payment.network} &bull; Rate: 1 USDT = ₱{(1 / parseFloat(payment.exchangeRate)).toFixed(2)}
         </p>
       </div>
 
       <div className="space-y-3">
         <p className="font-bold text-primary text-sm uppercase tracking-wider">
-          Send exactly {payment.amountUsdt} USDT to this address:
+          Send {payment.amountUsdt} USDT to this address:
         </p>
 
         <div className="bg-muted/50 rounded-2xl border border-border p-4">
@@ -115,7 +134,7 @@ function PaymentStep({
                 alt="Payment QR Code"
                 className="w-40 h-40"
               />
-              <p className="text-xs text-center text-muted-foreground mt-2">Scan to send USDT</p>
+              <p className="text-xs text-center text-muted-foreground mt-2">Scan with your wallet app</p>
             </div>
           </div>
         )}
@@ -123,10 +142,10 @@ function PaymentStep({
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-900 space-y-1">
           <p className="font-semibold">Important</p>
           <ul className="list-disc list-inside space-y-1 text-amber-800">
-            <li>Send only <strong>USDT on the TRON (TRC-20) network</strong></li>
+            <li>Send only <strong>USDT on TRON (TRC-20)</strong> network</li>
             <li>Send the exact amount: <strong>{payment.amountUsdt} USDT</strong></li>
-            <li>Your donation will be automatically forwarded to our fund wallet</li>
-            <li>Transactions typically confirm within 1-3 minutes</li>
+            <li>Funds are automatically forwarded to the BHSF wallet</li>
+            <li>Confirmations typically take 1–3 minutes</li>
           </ul>
         </div>
       </div>
@@ -139,11 +158,6 @@ function PaymentStep({
         <CheckCircle size={20} />
         I Have Sent the Payment
       </Button>
-
-      <p className="text-xs text-center text-muted-foreground">
-        After confirming your transfer, click the button above. Your donation will
-        be verified on-chain and credited to the Barangay Health Support Fund.
-      </p>
 
       <div className="flex justify-center">
         <a
@@ -160,20 +174,25 @@ function PaymentStep({
   );
 }
 
-export function Donation() {
-  const [selectedAmount, setSelectedAmount] = useState<number | "custom">(1000);
-  const [customAmount, setCustomAmount] = useState<string>("");
+function DonationForm({
+  paymentMethod,
+  onSuccess,
+}: {
+  paymentMethod: PaymentMethod;
+  onSuccess: (data: CryptoPaymentDetails | null, amountPhp: number) => void;
+}) {
+  const tiers = paymentMethod === "fiat" ? fiatTiers : cryptoTiers;
+  const minAmount = paymentMethod === "fiat" ? 50 : 800;
+
+  const [selectedAmount, setSelectedAmount] = useState<number | "custom">(tiers[0].amount);
+  const [customAmount, setCustomAmount] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [step, setStep] = useState<"form" | "payment">("form");
-  const [payment, setPayment] = useState<PaymentDetails | null>(null);
 
-  const amountPhp =
-    selectedAmount === "custom" ? Number(customAmount) : selectedAmount;
-
+  const amountPhp = selectedAmount === "custom" ? Number(customAmount) : selectedAmount;
   const currentImpact =
     selectedAmount === "custom"
       ? "Every contribution brings healthcare closer to those who need it."
@@ -183,8 +202,8 @@ export function Donation() {
     e.preventDefault();
     setError(null);
 
-    if (!amountPhp || amountPhp < 800) {
-      setError("The minimum donation is ₱800 due to network fee requirements.");
+    if (!amountPhp || amountPhp < minAmount) {
+      setError(`Please enter an amount of at least ₱${minAmount.toLocaleString()}.`);
       return;
     }
 
@@ -193,7 +212,7 @@ export function Donation() {
       const res = await fetch("/api/donate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amountPhp, firstName, lastName, email }),
+        body: JSON.stringify({ amountPhp, firstName, lastName, email, paymentMethod }),
       });
 
       const data = await res.json();
@@ -202,8 +221,11 @@ export function Donation() {
         throw new Error(data.error ?? "Payment could not be created. Please try again.");
       }
 
-      setPayment(data as PaymentDetails);
-      setStep("payment");
+      if (data.method === "fiat") {
+        window.location.href = data.checkoutUrl;
+      } else {
+        onSuccess(data as CryptoPaymentDetails, amountPhp);
+      }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Something went wrong.";
       setError(message);
@@ -212,14 +234,186 @@ export function Donation() {
     }
   };
 
-  const handleDone = () => {
-    window.location.href = "/thank-you";
+  const donateLabel = (() => {
+    if (selectedAmount === "custom" && customAmount)
+      return `Donate ₱${Number(customAmount).toLocaleString()}`;
+    if (selectedAmount !== "custom")
+      return `Donate ₱${selectedAmount.toLocaleString()}`;
+    return "Donate";
+  })();
+
+  return (
+    <motion.form
+      key={`form-${paymentMethod}`}
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 20 }}
+      onSubmit={handleSubmit}
+      className="space-y-8"
+      data-testid="donation-form"
+    >
+      {/* Amount Selection */}
+      <div>
+        <Label className="text-lg font-bold text-primary mb-4 block">
+          Select Amount (PHP)
+        </Label>
+        <div className="grid grid-cols-2 gap-3 mb-3">
+          {tiers.map((tier) => (
+            <button
+              key={tier.amount}
+              type="button"
+              data-testid={`tier-${tier.amount}`}
+              onClick={() => setSelectedAmount(tier.amount)}
+              className={`py-4 px-2 rounded-2xl border-2 font-bold text-lg transition-all ${
+                selectedAmount === tier.amount
+                  ? "border-primary bg-primary text-white shadow-md"
+                  : "border-border text-foreground hover:border-primary/50"
+              }`}
+            >
+              ₱{tier.amount.toLocaleString()}
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          data-testid="tier-custom"
+          onClick={() => setSelectedAmount("custom")}
+          className={`w-full py-4 px-2 rounded-2xl border-2 font-bold text-lg transition-all ${
+            selectedAmount === "custom"
+              ? "border-primary bg-primary text-white shadow-md"
+              : "border-border text-foreground hover:border-primary/50"
+          }`}
+        >
+          Custom Amount
+        </button>
+
+        {selectedAmount === "custom" && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            className="mt-3"
+          >
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-muted-foreground">₱</span>
+              <Input
+                type="number"
+                value={customAmount}
+                onChange={(e) => setCustomAmount(e.target.value)}
+                placeholder={`Minimum ₱${minAmount.toLocaleString()}`}
+                className="pl-8 h-14 text-lg rounded-xl"
+                min={minAmount}
+                data-testid="input-custom-amount"
+              />
+            </div>
+          </motion.div>
+        )}
+
+        {currentImpact && (
+          <div className="mt-4 p-4 rounded-xl bg-accent/10 border border-accent/20 flex items-start gap-3">
+            <Heart className="text-accent shrink-0 mt-0.5 fill-accent/40" size={18} />
+            <p className="text-sm font-medium text-primary">{currentImpact}</p>
+          </div>
+        )}
+      </div>
+
+      {/* Personal Details */}
+      <div className="space-y-4">
+        <Label className="text-lg font-bold text-primary block">Your Details</Label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="firstName">First Name</Label>
+            <Input
+              id="firstName"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              required
+              className="h-12 rounded-xl"
+              data-testid="input-first-name"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="lastName">Last Name</Label>
+            <Input
+              id="lastName"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              required
+              className="h-12 rounded-xl"
+              data-testid="input-last-name"
+            />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="email">Email Address</Label>
+          <Input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="h-12 rounded-xl"
+            data-testid="input-email"
+          />
+        </div>
+      </div>
+
+      {error && (
+        <div className="flex items-start gap-3 p-4 rounded-xl bg-red-50 border border-red-200 text-red-800">
+          <AlertCircle size={18} className="shrink-0 mt-0.5" />
+          <p className="text-sm font-medium">{error}</p>
+        </div>
+      )}
+
+      <Button
+        type="submit"
+        className="w-full h-16 text-xl rounded-2xl bg-accent hover:bg-accent/90 text-accent-foreground font-bold shadow-xl"
+        disabled={isSubmitting || (selectedAmount === "custom" && !customAmount)}
+        data-testid="button-donate"
+      >
+        {isSubmitting ? (
+          <span className="flex items-center gap-3">
+            <Loader2 className="animate-spin" size={22} />
+            {paymentMethod === "fiat" ? "Redirecting to checkout…" : "Generating payment address…"}
+          </span>
+        ) : donateLabel}
+      </Button>
+
+      <p className="text-xs text-center text-muted-foreground">
+        {paymentMethod === "fiat"
+          ? "You will be redirected to a secure checkout. Pay by card, GCash, Maya, bank transfer, or PayPal. Funds settle to our verified USDT wallet."
+          : "You will receive a unique USDT wallet address to send from any crypto wallet. Minimum ₱1,000. Processed by PayGate.to."}
+      </p>
+    </motion.form>
+  );
+}
+
+export function Donation() {
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("fiat");
+  const [step, setStep] = useState<"form" | "crypto-payment">("form");
+  const [cryptoPayment, setCryptoPayment] = useState<CryptoPaymentDetails | null>(null);
+  const [donationAmountPhp, setDonationAmountPhp] = useState(0);
+
+  const handleFormSuccess = (data: CryptoPaymentDetails | null, amountPhp: number) => {
+    if (data) {
+      setCryptoPayment(data);
+      setDonationAmountPhp(amountPhp);
+      setStep("crypto-payment");
+    }
   };
 
   const handleBack = () => {
     setStep("form");
-    setPayment(null);
-    setError(null);
+    setCryptoPayment(null);
+  };
+
+  const handleDone = () => {
+    window.location.href = "/thank-you";
+  };
+
+  const handleMethodChange = (method: PaymentMethod) => {
+    setPaymentMethod(method);
+    setStep("form");
+    setCryptoPayment(null);
   };
 
   return (
@@ -247,9 +441,9 @@ export function Donation() {
                 The Impact of Your Gift
               </h3>
               <ul className="space-y-4">
-                {tiers.map((tier) => (
+                {fiatTiers.map((tier) => (
                   <li key={tier.amount} className="flex gap-3">
-                    <span className="font-bold text-primary whitespace-nowrap min-w-[110px]">
+                    <span className="font-bold text-primary whitespace-nowrap min-w-[100px]">
                       ₱{tier.amount.toLocaleString()}
                     </span>
                     <span className="text-muted-foreground">{tier.impact}</span>
@@ -258,194 +452,93 @@ export function Donation() {
               </ul>
             </div>
 
-            <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/50 border border-border">
+            <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/50 border border-border mb-4">
               <Shield size={20} className="text-secondary shrink-0" />
               <p className="text-sm text-muted-foreground">
-                Payments are securely processed by{" "}
+                Fiat payments via{" "}
+                <span className="font-semibold text-foreground">NOWPayments</span>{" "}
+                and crypto via{" "}
                 <span className="font-semibold text-foreground">PayGate.to</span>.
-                Donations are received as USDT on the TRON network and credited
-                directly to our verified fund wallet.
+                All donations settle as USDT to our verified TRC-20 fund wallet.
               </p>
             </div>
 
-            <div className="mt-5 p-4 rounded-xl bg-primary/5 border border-primary/10">
-              <p className="text-xs text-muted-foreground">
-                <span className="font-semibold text-primary block mb-1">Crypto-native donations</span>
-                No sign-up or account required. Minimum donation is ₱1,000 (~17 USDT).
-                Send USDT via TRC-20 — the fastest and lowest-fee stablecoin network.
-              </p>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { label: "GCash", desc: "via card tab" },
+                { label: "Maya", desc: "via card tab" },
+                { label: "Credit Card", desc: "via card tab" },
+                { label: "PayPal", desc: "via card tab" },
+                { label: "Bank Transfer", desc: "via card tab" },
+                { label: "USDT (TRC-20)", desc: "via crypto tab" },
+              ].map((p) => (
+                <div
+                  key={p.label}
+                  className="flex flex-col px-3 py-2 rounded-xl border border-border bg-white text-sm"
+                >
+                  <span className="font-semibold text-foreground">{p.label}</span>
+                  <span className="text-xs text-muted-foreground">{p.desc}</span>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Right Column: Form / Payment */}
+          {/* Right Column */}
           <div className="w-full lg:w-7/12">
             <Card className="border-0 shadow-2xl rounded-3xl overflow-hidden bg-white">
               <CardContent className="p-8 md:p-10">
+
+                {/* Payment Method Toggle — only show when on form step */}
+                {step === "form" && (
+                  <div className="flex rounded-2xl border border-border bg-muted/30 p-1 mb-8 gap-1">
+                    <button
+                      type="button"
+                      onClick={() => handleMethodChange("fiat")}
+                      className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-semibold text-sm transition-all ${
+                        paymentMethod === "fiat"
+                          ? "bg-white shadow-md text-primary border border-border"
+                          : "text-muted-foreground hover:text-primary"
+                      }`}
+                      data-testid="tab-fiat"
+                    >
+                      <CreditCard size={17} />
+                      Card / GCash / Maya
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleMethodChange("crypto")}
+                      className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-semibold text-sm transition-all ${
+                        paymentMethod === "crypto"
+                          ? "bg-white shadow-md text-primary border border-border"
+                          : "text-muted-foreground hover:text-primary"
+                      }`}
+                      data-testid="tab-crypto"
+                    >
+                      <Bitcoin size={17} />
+                      Crypto (USDT)
+                    </button>
+                  </div>
+                )}
+
                 <AnimatePresence mode="wait">
                   {step === "form" && (
-                    <motion.form
-                      key="form"
-                      initial={{ opacity: 0, x: -40 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 40 }}
-                      onSubmit={handleSubmit}
-                      className="space-y-8"
-                      data-testid="donation-form"
-                    >
-                      {/* Amount Selection */}
-                      <div>
-                        <Label className="text-lg font-bold text-primary mb-4 block">
-                          Select Amount (PHP)
-                        </Label>
-                        <div className="grid grid-cols-2 gap-3 mb-4">
-                          {tiers.map((tier) => (
-                            <button
-                              key={tier.amount}
-                              type="button"
-                              data-testid={`tier-${tier.amount}`}
-                              onClick={() => setSelectedAmount(tier.amount)}
-                              className={`py-4 px-2 rounded-2xl border-2 font-bold text-lg transition-all ${
-                                selectedAmount === tier.amount
-                                  ? "border-primary bg-primary text-white shadow-md"
-                                  : "border-border text-foreground hover:border-primary/50"
-                              }`}
-                            >
-                              ₱{tier.amount.toLocaleString()}
-                            </button>
-                          ))}
-                        </div>
-                        <button
-                          type="button"
-                          data-testid="tier-custom"
-                          onClick={() => setSelectedAmount("custom")}
-                          className={`w-full py-4 px-2 rounded-2xl border-2 font-bold text-lg transition-all ${
-                            selectedAmount === "custom"
-                              ? "border-primary bg-primary text-white shadow-md"
-                              : "border-border text-foreground hover:border-primary/50"
-                          }`}
-                        >
-                          Custom Amount
-                        </button>
-
-                        {selectedAmount === "custom" && (
-                          <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            className="mt-3"
-                          >
-                            <div className="relative">
-                              <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-muted-foreground">
-                                ₱
-                              </span>
-                              <Input
-                                type="number"
-                                value={customAmount}
-                                onChange={(e) => setCustomAmount(e.target.value)}
-                                placeholder="Minimum ₱1,000"
-                                className="pl-8 h-14 text-lg rounded-xl"
-                                min="1000"
-                                data-testid="input-custom-amount"
-                              />
-                            </div>
-                          </motion.div>
-                        )}
-
-                        {currentImpact && (
-                          <div className="mt-4 p-4 rounded-xl bg-accent/10 border border-accent/20 flex items-start gap-3">
-                            <Heart className="text-accent shrink-0 mt-0.5 fill-accent/40" size={18} />
-                            <p className="text-sm font-medium text-primary">{currentImpact}</p>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Personal Details */}
-                      <div className="space-y-4">
-                        <Label className="text-lg font-bold text-primary block">Your Details</Label>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="firstName">First Name</Label>
-                            <Input
-                              id="firstName"
-                              value={firstName}
-                              onChange={(e) => setFirstName(e.target.value)}
-                              required
-                              className="h-12 rounded-xl"
-                              data-testid="input-first-name"
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="lastName">Last Name</Label>
-                            <Input
-                              id="lastName"
-                              value={lastName}
-                              onChange={(e) => setLastName(e.target.value)}
-                              required
-                              className="h-12 rounded-xl"
-                              data-testid="input-last-name"
-                            />
-                          </div>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="email">Email Address</Label>
-                          <Input
-                            id="email"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                            className="h-12 rounded-xl"
-                            data-testid="input-email"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Error */}
-                      {error && (
-                        <div className="flex items-start gap-3 p-4 rounded-xl bg-red-50 border border-red-200 text-red-800">
-                          <AlertCircle size={18} className="shrink-0 mt-0.5" />
-                          <p className="text-sm font-medium">{error}</p>
-                        </div>
-                      )}
-
-                      {/* Submit */}
-                      <Button
-                        type="submit"
-                        className="w-full h-16 text-xl rounded-2xl bg-accent hover:bg-accent/90 text-accent-foreground font-bold shadow-xl"
-                        disabled={isSubmitting || (selectedAmount === "custom" && !customAmount)}
-                        data-testid="button-donate"
-                      >
-                        {isSubmitting ? (
-                          <span className="flex items-center gap-3">
-                            <Loader2 className="animate-spin" size={22} />
-                            Generating payment address…
-                          </span>
-                        ) : (
-                          `Donate ${
-                            selectedAmount === "custom" && customAmount
-                              ? `₱${Number(customAmount).toLocaleString()}`
-                              : selectedAmount !== "custom"
-                              ? `₱${selectedAmount.toLocaleString()}`
-                              : ""
-                          }`
-                        )}
-                      </Button>
-
-                      <p className="text-xs text-center text-muted-foreground">
-                        You will receive a unique USDT wallet address to send your donation.
-                        No account or sign-up required. Processed by PayGate.to — no KYC.
-                      </p>
-                    </motion.form>
+                    <DonationForm
+                      key={paymentMethod}
+                      paymentMethod={paymentMethod}
+                      onSuccess={handleFormSuccess}
+                    />
                   )}
 
-                  {step === "payment" && payment && (
-                    <PaymentStep
-                      amountPhp={amountPhp}
-                      payment={payment}
+                  {step === "crypto-payment" && cryptoPayment && (
+                    <CryptoPaymentStep
+                      amountPhp={donationAmountPhp}
+                      payment={cryptoPayment}
                       onBack={handleBack}
                       onDone={handleDone}
                     />
                   )}
                 </AnimatePresence>
+
               </CardContent>
             </Card>
           </div>
