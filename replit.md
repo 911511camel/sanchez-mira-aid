@@ -21,14 +21,17 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 ### Barangay Health Support Fund (`artifacts/bhsf-website`)
 - React + Vite fundraising website
 - Sections: Hero, Mission, Programs, Impact, Donation, Contact, Footer
-- Real payment integration via **NOWPayments** — donations settle to USDT TRC-20 wallet `TPMUHFSebNNJfoeFiusq6TBypbsJy8DByw`
-- Donation flow: fill form → POST `/api/donate` → redirects to NOWPayments checkout → donor pays → NOWPayments settles USDT
-- `NOWPAYMENTS_API_KEY` must be set in secrets
-- **Important**: set your USDT payout wallet in NOWPayments dashboard → Settings → Store Settings → Payout Wallet
+- Real payment integration via **PayGate.to** (no API key, no signup) — donations settle to USDT TRC-20 wallet `TPMUHFSebNNJfoeFiusq6TBypbsJy8DByw`
+- Donation flow: fill form → POST `/api/donate` → PayGate.to generates unique TRON receiving address → donor sends USDT to address → PayGate.to auto-forwards to fund wallet
+- No API key required — PayGate.to is fully open access
+- Minimum donation: ₱1,000 (~17 USDT) due to TRC-20 network minimums
+- Donation tiers: ₱1,000 / ₱2,500 / ₱5,000 / ₱10,000 / custom
+- Callback endpoint: `GET /api/donate/callback` — called by PayGate.to on payment confirmation
 
 ### API Server (`artifacts/api-server`)
 - Express 5 backend
-- `POST /api/donate` — creates NOWPayments invoice, returns `{ checkoutUrl, invoiceId }`
+- `POST /api/donate` — calls PayGate.to to generate USDT TRC-20 address, returns `{ donationId, addressIn, amountUsdt, qrCode, ... }`
+- `GET /api/donate/callback` — PayGate.to webhook to confirm payment
 
 ## Key Commands
 
