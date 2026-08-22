@@ -1,11 +1,13 @@
 import React from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { HeartPulse } from "lucide-react";
+import { HeartPulse, Languages } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { useLanguage } from "@/lib/i18n";
 
 export function Navbar() {
   const { scrollY } = useScroll();
+  const { t, lang, toggle } = useLanguage();
   const backgroundColor = useTransform(
     scrollY,
     [0, 50],
@@ -41,19 +43,29 @@ export function Navbar() {
           </div>
           <div className="flex flex-col">
             <span className="font-serif font-bold text-lg leading-tight text-primary">BHSF</span>
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Barangay Health Support</span>
+            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{t("Barangay Health Support")}</span>
           </div>
         </Link>
         
         <nav className="hidden md:flex items-center gap-8">
-          <a href="#mission" className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">Mission</a>
-          <a href="#programs" className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">Programs</a>
-          <a href="#impact" className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">Impact</a>
+          <a href="#mission" className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">{t("Mission")}</a>
+          <a href="#programs" className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">{t("Programs")}</a>
+          <a href="#impact" className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">{t("Impact")}</a>
         </nav>
         
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          <Button
+            onClick={toggle}
+            size="sm"
+            variant="outline"
+            className="rounded-full gap-2 text-sm"
+            aria-label="Switch language"
+          >
+            <Languages size={16} />
+            {lang === "en" ? "Tagalog" : "English"}
+          </Button>
           <Button onClick={scrollToDonate} size="lg" className="rounded-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold shadow-md">
-            Donate Now
+            {t("Donate Now")}
           </Button>
         </div>
       </div>

@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Stethoscope, Landmark, HeartPulse, GraduationCap } from "lucide-react";
 import drPhoto from "@/assets/images/dr-sacramed.jpg";
+import { useLanguage } from "@/lib/i18n";
 
 const details = [
   {
@@ -27,6 +28,8 @@ const details = [
 ];
 
 export function Leadership() {
+  const { t } = useLanguage();
+
   return (
     <section id="leadership" className="py-24 bg-muted/30">
       <div className="container mx-auto px-4 md:px-6">
@@ -37,7 +40,7 @@ export function Leadership() {
             viewport={{ once: true }}
             className="text-secondary font-bold tracking-wider uppercase text-sm mb-2 block"
           >
-            Our Leadership
+            {t("Our Leadership")}
           </motion.span>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -45,7 +48,7 @@ export function Leadership() {
             viewport={{ once: true }}
             className="text-4xl md:text-5xl font-bold font-serif mb-6 text-primary"
           >
-            Meet Our Fund Coordinator
+            {t("Meet Our Fund Coordinator")}
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -54,7 +57,7 @@ export function Leadership() {
             transition={{ delay: 0.1 }}
             className="text-lg text-muted-foreground leading-relaxed"
           >
-            A physician and public servant dedicated to bringing healthcare closer to every barangay.
+            {t("A physician and public servant dedicated to bringing healthcare closer to every barangay.")}
           </motion.p>
         </div>
 
@@ -75,10 +78,10 @@ export function Leadership() {
                 Dr. Connie Marie Oroceo-Sacramed
               </h3>
               <p className="text-primary-foreground/80">
-                Vice Mayor of Sanchez-Mira, Cagayan — running under the Nacionalista Party (NP)
+                {t("Vice Mayor of Sanchez-Mira, Cagayan — running under the Nacionalista Party (NP)")}
               </p>
               <p className="text-primary-foreground/80 mt-2">
-                A medical doctor involved in community health and local public service programs.
+                {t("A medical doctor involved in community health and local public service programs.")}
               </p>
             </div>
           </div>
@@ -98,9 +101,9 @@ export function Leadership() {
                 </div>
                 <div>
                   <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">
-                    {item.label}
+                    {t(item.label)}
                   </div>
-                  <p className="font-semibold text-foreground leading-snug">{item.value}</p>
+                  <p className="font-semibold text-foreground leading-snug">{t(item.value)}</p>
                 </div>
               </motion.div>
             ))}

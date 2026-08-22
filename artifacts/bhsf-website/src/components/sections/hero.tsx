@@ -3,8 +3,10 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import heroImg from "@/assets/images/hero.png";
 import { HeartHandshake } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 
 export function Hero() {
+  const { t } = useLanguage();
   const scrollToDonate = () => {
     const el = document.getElementById("donate");
     if (el) {
@@ -42,7 +44,7 @@ export function Hero() {
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
             className="text-5xl md:text-6xl lg:text-7xl font-bold font-serif text-white leading-[1.1] mb-6"
           >
-            Better Health for Every Barangay
+            {t("Better Health for Every Barangay")}
           </motion.h1>
           
           <motion.p 
@@ -51,7 +53,7 @@ export function Hero() {
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
             className="text-xl md:text-2xl text-white/90 mb-10 max-w-xl font-light"
           >
-            No family should have to choose between their next meal and essential medicine. Help us bring care directly to rural communities.
+            {t("No family should have to choose between their next meal and essential medicine. Help us bring care directly to rural communities.")}
           </motion.p>
           
           <motion.div 
@@ -61,10 +63,10 @@ export function Hero() {
             className="flex flex-col sm:flex-row gap-4"
           >
             <Button onClick={scrollToDonate} size="lg" className="h-14 px-8 text-lg rounded-full bg-accent hover:bg-accent/90 text-accent-foreground shadow-xl hover:scale-105 transition-transform">
-              Make a Donation
+              {t("Make a Donation")}
             </Button>
             <Button size="lg" variant="outline" className="h-14 px-8 text-lg rounded-full bg-white/10 hover:bg-white/20 text-white border-white/30 backdrop-blur-sm transition-all" asChild>
-              <a href="#mission">Learn More</a>
+              <a href="#mission">{t("Learn More")}</a>
             </Button>
           </motion.div>
         </div>

@@ -14,6 +14,7 @@ import {
   Copy,
   CheckCircle,
 } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 
 type PaymentMethod = "gcash" | "crypto";
 
@@ -27,6 +28,7 @@ const donationTiers = [
 ];
 
 function DonationForm({ paymentMethod }: { paymentMethod: PaymentMethod }) {
+  const { t } = useLanguage();
   const [selectedAmount, setSelectedAmount] = useState<number | "custom">(donationTiers[0].amount);
   const [customAmount, setCustomAmount] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -39,8 +41,8 @@ function DonationForm({ paymentMethod }: { paymentMethod: PaymentMethod }) {
   const amountPhp = selectedAmount === "custom" ? Number(customAmount) : selectedAmount;
   const currentImpact =
     selectedAmount === "custom"
-      ? "Every contribution brings healthcare closer to those who need it."
-      : donationTiers.find((t) => t.amount === selectedAmount)?.impact;
+      ? t("Every contribution brings healthcare closer to those who need it.")
+      : t(donationTiers.find((tier) => tier.amount === selectedAmount)?.impact ?? "");
 
   const copyGcashNumber = async () => {
     try {
@@ -55,7 +57,7 @@ function DonationForm({ paymentMethod }: { paymentMethod: PaymentMethod }) {
     setError(null);
 
     if (!amountPhp || amountPhp < 50) {
-      setError("Please enter an amount of at least ₱50.");
+      setError(t("Please enter an amount of at least ₱50."));
       return;
     }
 
@@ -69,15 +71,15 @@ function DonationForm({ paymentMethod }: { paymentMethod: PaymentMethod }) {
 
       const data = await res.json() as { checkoutUrl?: string; error?: string };
 
-      if (!res.ok) throw new Error(data.error ?? "Payment could not be created. Please try again.");
+      if (!res.ok) throw new Error(data.error ?? t("Payment could not be created. Please try again."));
 
       if (data.checkoutUrl) {
         window.location.href = data.checkoutUrl;
       } else {
-        throw new Error("No checkout URL returned. Please try again.");
+        throw new Error(t("No checkout URL returned. Please try again."));
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      setError(err instanceof Error ? err.message : t("Something went wrong."));
     } finally {
       setIsSubmitting(false);
     }
@@ -85,15 +87,15 @@ function DonationForm({ paymentMethod }: { paymentMethod: PaymentMethod }) {
 
   const donateLabel = (() => {
     if (selectedAmount === "custom" && customAmount)
-      return `Donate ₱${Number(customAmount).toLocaleString()}`;
+      return `${t("Donate")} ₱${Number(customAmount).toLocaleString()}`;
     if (selectedAmount !== "custom")
-      return `Donate ₱${selectedAmount.toLocaleString()}`;
-    return "Donate";
+      return `${t("Donate")} ₱${selectedAmount.toLocaleString()}`;
+    return t("Donate");
   })();
 
   const redirectingLabel = paymentMethod === "gcash"
-    ? "Redirecting to GCash…"
-    : "Opening NOWPayments checkout…";
+    ? t("Redirecting to GCash…")
+    : t("Opening NOWPayments checkout…");
 
   return (
     <motion.form
@@ -106,7 +108,7 @@ function DonationForm({ paymentMethod }: { paymentMethod: PaymentMethod }) {
       data-testid="donation-form"
     >
       <div>
-        <Label className="text-lg font-bold text-primary mb-4 block">Select Amount (PHP)</Label>
+        <Label className="text-lg font-bold text-primary mb-4 block">{t("Select Amount (PHP)")}</Label>
         <div className="grid grid-cols-2 gap-3 mb-3">
           {donationTiers.map((tier) => (
             <button
@@ -134,7 +136,7 @@ function DonationForm({ paymentMethod }: { paymentMethod: PaymentMethod }) {
               : "border-border text-foreground hover:border-primary/50"
           }`}
         >
-          Custom Amount
+          {t("Custom Amount")}
         </button>
 
         {selectedAmount === "custom" && (
@@ -145,7 +147,7 @@ function DonationForm({ paymentMethod }: { paymentMethod: PaymentMethod }) {
                 type="number"
                 value={customAmount}
                 onChange={(e) => setCustomAmount(e.target.value)}
-                placeholder="Minimum ₱50"
+                placeholder={t("Minimum ₱50")}
                 className="pl-8 h-14 text-lg rounded-xl"
                 min={50}
                 data-testid="input-custom-amount"
@@ -170,14 +172,14 @@ function DonationForm({ paymentMethod }: { paymentMethod: PaymentMethod }) {
           data-testid="gcash-details"
         >
           <Label className="text-lg font-bold text-secondary block mb-1">
-            Pay via GCash
+            {t("Pay via GCash")}
           </Label>
           <p className="text-sm text-muted-foreground mb-3">
-            Send your donation to this GCash number:
+            {t("Send your donation to this GCash number:")}
           </p>
           <div className="flex items-center justify-between gap-3 rounded-xl bg-white border border-border px-5 py-4">
             <div>
-              <p className="text-xs text-muted-foreground mb-0.5">GCash Number</p>
+              <p className="text-xs text-muted-foreground mb-0.5">{t("GCash Number")}</p>
               <p className="font-mono text-2xl font-bold text-foreground tracking-wider">
                 {GCASH_NUMBER}
               </p>
@@ -190,23 +192,23 @@ function DonationForm({ paymentMethod }: { paymentMethod: PaymentMethod }) {
               className="gap-2 rounded-xl shrink-0"
             >
               {copied ? (
-                <><CheckCircle size={14} className="text-green-600" /><span className="text-green-600">Copied</span></>
+                <><CheckCircle size={14} className="text-green-600" /><span className="text-green-600">{t("Copied")}</span></>
               ) : (
-                <><Copy size={14} />Copy</>
+                <><Copy size={14} />{t("Copy")}</>
               )}
             </Button>
           </div>
           <p className="text-xs text-muted-foreground mt-3">
-            After sending, complete the form below and submit to confirm your donation.
+            {t("After sending, complete the form below and submit to confirm your donation.")}
           </p>
         </motion.div>
       )}
 
       <div className="space-y-4">
-        <Label className="text-lg font-bold text-primary block">Your Details</Label>
+        <Label className="text-lg font-bold text-primary block">{t("Your Details")}</Label>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="firstName">First Name</Label>
+            <Label htmlFor="firstName">{t("First Name")}</Label>
             <Input
               id="firstName"
               value={firstName}
@@ -217,7 +219,7 @@ function DonationForm({ paymentMethod }: { paymentMethod: PaymentMethod }) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="lastName">Last Name</Label>
+            <Label htmlFor="lastName">{t("Last Name")}</Label>
             <Input
               id="lastName"
               value={lastName}
@@ -229,7 +231,7 @@ function DonationForm({ paymentMethod }: { paymentMethod: PaymentMethod }) {
           </div>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="email">Email Address</Label>
+          <Label htmlFor="email">{t("Email Address")}</Label>
           <Input
             id="email"
             type="email"
@@ -264,14 +266,15 @@ function DonationForm({ paymentMethod }: { paymentMethod: PaymentMethod }) {
       </Button>
 
       <p className="text-xs text-center text-muted-foreground">
-        {paymentMethod === "gcash" && `Donate to GCash ${GCASH_NUMBER}, then complete the form below to confirm.`}
-        {paymentMethod === "crypto" && "Redirects to NOWPayments secure checkout. Pay with Bitcoin, Ethereum, USDT, USDC, and 100+ other cryptocurrencies."}
+        {paymentMethod === "gcash" && `${t("Donate to GCash")} ${GCASH_NUMBER}, ${t("then complete the form below to confirm.")}`}
+        {paymentMethod === "crypto" && t("Redirects to NOWPayments secure checkout. Pay with Bitcoin, Ethereum, USDT, USDC, and 100+ other cryptocurrencies.")}
       </p>
     </motion.form>
   );
 }
 
 export function Donation() {
+  const { t } = useLanguage();
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("gcash");
 
   return (
@@ -282,21 +285,19 @@ export function Donation() {
           {/* Left Column */}
           <div className="w-full lg:w-5/12 pt-8">
             <span className="text-secondary font-bold tracking-wider uppercase text-sm mb-2 block">
-              Take Action
+              {t("Take Action")}
             </span>
             <h2 className="text-4xl md:text-5xl font-bold font-serif mb-6 text-primary">
-              Make a Difference Today
+              {t("Make a Difference Today")}
             </h2>
             <p className="text-lg text-muted-foreground mb-8">
-              Your generosity directly translates to medicines, doctor visits, and
-              better health for families in Sanchez Mira. Every peso is stretched to
-              maximize impact in the barangays.
+              {t("Your generosity directly translates to medicines, doctor visits, and better health for families in Sanchez Mira. Every peso is stretched to maximize impact in the barangays.")}
             </p>
 
             <div className="bg-secondary/10 p-6 rounded-2xl border border-secondary/20 mb-6">
               <h3 className="font-bold text-secondary text-xl mb-4 flex items-center gap-2">
                 <Heart className="fill-secondary" size={20} />
-                The Impact of Your Gift
+                {t("The Impact of Your Gift")}
               </h3>
               <ul className="space-y-4">
                 {donationTiers.map((tier) => (
@@ -304,7 +305,7 @@ export function Donation() {
                     <span className="font-bold text-primary whitespace-nowrap min-w-[100px]">
                       ₱{tier.amount.toLocaleString()}
                     </span>
-                    <span className="text-muted-foreground">{tier.impact}</span>
+                    <span className="text-muted-foreground">{t(tier.impact)}</span>
                   </li>
                 ))}
               </ul>
@@ -313,11 +314,11 @@ export function Donation() {
             <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/50 border border-border mb-4">
               <Shield size={20} className="text-secondary shrink-0" />
               <p className="text-sm text-muted-foreground">
-                GCash donations via{" "}
+                {t("GCash donations via")}{" "}
                 <span className="font-semibold text-foreground">HitPay</span>.{" "}
-                Crypto donations via{" "}
-                <span className="font-semibold text-foreground">NOWPayments</span>,
-                supporting 100+ cryptocurrencies worldwide.
+                {t("Crypto donations via")}{" "}
+                <span className="font-semibold text-foreground">NOWPayments</span>,{" "}
+                {t("supporting 100+ cryptocurrencies worldwide.")}
               </p>
             </div>
 
@@ -332,8 +333,8 @@ export function Donation() {
                   key={p.label}
                   className="flex flex-col px-3 py-2 rounded-xl border border-border bg-white text-sm"
                 >
-                  <span className="font-semibold text-foreground">{p.label}</span>
-                  <span className="text-xs text-muted-foreground">{p.desc}</span>
+                  <span className="font-semibold text-foreground">{t(p.label)}</span>
+                  <span className="text-xs text-muted-foreground">{t(p.desc)}</span>
                 </div>
               ))}
             </div>
@@ -347,7 +348,7 @@ export function Donation() {
                 <div className="grid grid-cols-2 rounded-2xl border border-border bg-muted/30 p-1 mb-8 gap-1">
                   {([
                     { key: "gcash",  icon: <Smartphone size={15} />, label: "GCash" },
-                    { key: "crypto", icon: <Bitcoin size={15} />,    label: "Crypto" },
+                    { key: "crypto", icon: <Bitcoin size={15} />,    label: t("Crypto") },
                   ] as { key: PaymentMethod; icon: React.ReactNode; label: string }[]).map(({ key, icon, label }) => (
                     <button
                       key={key}

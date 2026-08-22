@@ -1,8 +1,11 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Leaf, Sun, Users } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 
 export function Mission() {
+  const { t } = useLanguage();
+
   return (
     <section id="mission" className="py-24 bg-background relative overflow-hidden">
       {/* Decorative background elements */}
@@ -17,7 +20,7 @@ export function Mission() {
             viewport={{ once: true }}
             className="text-4xl md:text-5xl font-bold font-serif mb-6 text-primary"
           >
-            Our Mission
+            {t("Our Mission")}
           </motion.h2>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -26,7 +29,7 @@ export function Mission() {
             transition={{ delay: 0.1 }}
             className="text-xl md:text-2xl text-muted-foreground font-serif italic leading-relaxed"
           >
-            "To improve healthcare access and quality of life in rural barangays of Sanchez Mira, Cagayan, Philippines."
+            {t("To improve healthcare access and quality of life in rural barangays of Sanchez Mira, Cagayan, Philippines.")}
           </motion.p>
         </div>
 
@@ -59,9 +62,9 @@ export function Mission() {
               <div className="w-16 h-16 rounded-full bg-secondary/10 text-secondary flex items-center justify-center mb-6">
                 <item.icon size={32} />
               </div>
-              <h3 className="text-xl font-bold mb-3 text-primary">{item.title}</h3>
+              <h3 className="text-xl font-bold mb-3 text-primary">{t(item.title)}</h3>
               <p className="text-muted-foreground leading-relaxed">
-                {item.description}
+                {t(item.description)}
               </p>
             </motion.div>
           ))}

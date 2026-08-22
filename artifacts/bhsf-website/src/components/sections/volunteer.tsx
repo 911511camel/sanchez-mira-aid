@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Heart, AlertCircle, Loader2, CheckCircle, Stethoscope, Users, HandHeart } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 
 const specializations = [
   "General Practitioner",
@@ -35,6 +36,7 @@ const benefits = [
 ];
 
 export function Volunteer() {
+  const { t } = useLanguage();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -49,17 +51,16 @@ export function Volunteer() {
     setError(null);
 
     if (!fullName.trim() || !specialization) {
-      setError("Please provide your name and medical specialization.");
+      setError(t("Please provide your name and medical specialization."));
       return;
     }
 
     setIsSubmitting(true);
     try {
-      // Placeholder submission — wire up to an API/backend endpoint when available.
       await new Promise((resolve) => setTimeout(resolve, 800));
       setSubmitted(true);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      setError(err instanceof Error ? err.message : t("Something went wrong."));
     } finally {
       setIsSubmitting(false);
     }
@@ -75,7 +76,7 @@ export function Volunteer() {
             viewport={{ once: true }}
             className="text-secondary font-bold tracking-wider uppercase text-sm mb-2 block"
           >
-            Get Involved
+            {t("Get Involved")}
           </motion.span>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -83,7 +84,7 @@ export function Volunteer() {
             viewport={{ once: true }}
             className="text-4xl md:text-5xl font-bold font-serif mb-6 text-primary"
           >
-            Join Our Volunteer Team
+            {t("Join Our Volunteer Team")}
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -92,8 +93,7 @@ export function Volunteer() {
             transition={{ delay: 0.1 }}
             className="text-lg text-muted-foreground leading-relaxed"
           >
-            Whether you are a medical professional or a community partner, your time and skills
-            directly power the mobile missions that bring healthcare to remote barangays.
+            {t("Whether you are a medical professional or a community partner, your time and skills directly power the mobile missions that bring healthcare to remote barangays.")}
           </motion.p>
         </div>
 
@@ -111,8 +111,8 @@ export function Volunteer() {
               <div className="w-14 h-14 rounded-2xl bg-secondary/10 text-secondary flex items-center justify-center mx-auto mb-5">
                 <item.icon size={28} />
               </div>
-              <h3 className="text-xl font-bold font-serif text-primary mb-3">{item.title}</h3>
-              <p className="text-muted-foreground leading-relaxed">{item.description}</p>
+              <h3 className="text-xl font-bold font-serif text-primary mb-3">{t(item.title)}</h3>
+              <p className="text-muted-foreground leading-relaxed">{t(item.description)}</p>
             </motion.div>
           ))}
         </div>
@@ -121,12 +121,10 @@ export function Volunteer() {
           {/* Left: intro */}
           <div className="pt-6">
             <h3 className="text-2xl font-bold font-serif text-primary mb-4">
-              Medical Professionals
+              {t("Medical Professionals")}
             </h3>
             <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-              Apply to join our <strong className="text-foreground">Medical Missions</strong> — mobile
-              outreach clinics that bring diagnostic screenings, pediatric check-ups, and geriatric
-              consultations directly to isolated barangays.
+              {t("Apply to join our")} <strong className="text-foreground">Medical Missions</strong> {t("— mobile outreach clinics that bring diagnostic screenings, pediatric check-ups, and geriatric consultations directly to isolated barangays.")}
             </p>
             <ul className="space-y-4">
               {[
@@ -137,7 +135,7 @@ export function Volunteer() {
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <CheckCircle size={18} className="text-secondary shrink-0 mt-0.5" />
-                  <span className="text-muted-foreground">{item}</span>
+                  <span className="text-muted-foreground">{t(item)}</span>
                 </li>
               ))}
             </ul>
@@ -145,7 +143,7 @@ export function Volunteer() {
             <div className="mt-8 p-5 rounded-2xl bg-secondary/10 border border-secondary/20 flex items-start gap-3">
               <Heart size={18} className="text-secondary shrink-0 mt-0.5 fill-secondary/20" />
               <p className="text-sm text-muted-foreground">
-                Every volunteer hour brings a family one step closer to the care they deserve.
+                {t("Every volunteer hour brings a family one step closer to the care they deserve.")}
               </p>
             </div>
           </div>
@@ -162,11 +160,10 @@ export function Volunteer() {
                   <CheckCircle size={40} className="text-secondary" />
                 </div>
                 <h3 className="text-2xl font-bold font-serif text-primary mb-3">
-                  Thank You for Volunteering!
+                  {t("Thank You for Volunteering!")}
                 </h3>
                 <p className="text-muted-foreground mb-6">
-                  Your application has been received. Our team will reach out to you with details on
-                  joining the next Medical Mission.
+                  {t("Your application has been received. Our team will reach out to you with details on joining the next Medical Mission.")}
                 </p>
                 <Button
                   type="button"
@@ -181,7 +178,7 @@ export function Volunteer() {
                   }}
                   className="rounded-full"
                 >
-                  Submit Another Application
+                  {t("Submit Another Application")}
                 </Button>
               </motion.div>
             ) : (
@@ -192,23 +189,23 @@ export function Volunteer() {
                 className="space-y-5"
               >
                 <h3 className="text-xl font-bold font-serif text-primary mb-2">
-                  Volunteer Application
+                  {t("Volunteer Application")}
                 </h3>
 
                 <div className="space-y-2">
-                  <Label htmlFor="volunteer-name">Full Name</Label>
+                  <Label htmlFor="volunteer-name">{t("Full Name")}</Label>
                   <Input
                     id="volunteer-name"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     required
-                    placeholder="Dr. Juan Dela Cruz"
+                    placeholder={t("Dr. Juan Dela Cruz")}
                     className="h-12 rounded-xl"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="volunteer-email">Email Address</Label>
+                  <Label htmlFor="volunteer-email">{t("Email Address")}</Label>
                   <Input
                     id="volunteer-email"
                     type="email"
@@ -220,7 +217,7 @@ export function Volunteer() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="volunteer-phone">Phone Number</Label>
+                  <Label htmlFor="volunteer-phone">{t("Phone Number")}</Label>
                   <Input
                     id="volunteer-phone"
                     value={phone}
@@ -231,26 +228,26 @@ export function Volunteer() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Medical Specialization</Label>
+                  <Label>{t("Medical Specialization")}</Label>
                   <Select value={specialization} onValueChange={setSpecialization}>
                     <SelectTrigger className="h-12 rounded-xl">
-                      <SelectValue placeholder="Select your specialization" />
+                      <SelectValue placeholder={t("Select your specialization")} />
                     </SelectTrigger>
                     <SelectContent>
                       {specializations.map((s) => (
-                        <SelectItem key={s} value={s}>{s}</SelectItem>
+                        <SelectItem key={s} value={s}>{t(s)}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="volunteer-message">Tell Us About Yourself</Label>
+                  <Label htmlFor="volunteer-message">{t("Tell Us About Yourself")}</Label>
                   <Textarea
                     id="volunteer-message"
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Share your experience, availability, and why you'd like to volunteer…"
+                    placeholder={t("Share your experience, availability, and why you'd like to volunteer…")}
                     rows={4}
                     className="rounded-xl"
                   />
@@ -271,15 +268,15 @@ export function Volunteer() {
                   {isSubmitting ? (
                     <span className="flex items-center gap-3">
                       <Loader2 className="animate-spin" size={20} />
-                      Submitting…
+                      {t("Submitting…")}
                     </span>
                   ) : (
-                    "Submit Application"
+                    t("Submit Application")
                   )}
                 </Button>
 
                 <p className="text-xs text-center text-muted-foreground">
-                  We'll contact you about upcoming Medical Missions. No experience required to help.
+                  {t("We'll contact you about upcoming Medical Missions. No experience required to help.")}
                 </p>
               </motion.form>
             )}

@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Home, Users, Truck } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 
 const stats = [
   {
@@ -24,6 +25,8 @@ const stats = [
 ];
 
 export function Impact() {
+  const { t } = useLanguage();
+
   return (
     <section id="impact" className="py-24 bg-primary text-primary-foreground relative overflow-hidden">
       {/* Decorative pattern */}
@@ -32,10 +35,10 @@ export function Impact() {
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-4xl md:text-5xl font-bold font-serif mb-6 text-white">
-            Our Impact So Far
+            {t("Our Impact So Far")}
           </h2>
           <p className="text-lg text-primary-foreground/80">
-            Every number represents a family relieved of worry, a child growing up healthier, and a community standing stronger together.
+            {t("Every number represents a family relieved of worry, a child growing up healthier, and a community standing stronger together.")}
           </p>
         </div>
 
@@ -53,9 +56,9 @@ export function Impact() {
                 <stat.icon size={32} />
               </div>
               <div className="text-5xl font-bold font-serif text-white mb-2">{stat.value}</div>
-              <div className="text-xl font-semibold text-white/90 mb-4">{stat.label}</div>
+              <div className="text-xl font-semibold text-white/90 mb-4">{t(stat.label)}</div>
               <p className="text-primary-foreground/70">
-                {stat.description}
+                {t(stat.description)}
               </p>
             </motion.div>
           ))}

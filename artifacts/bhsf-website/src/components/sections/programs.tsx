@@ -5,6 +5,7 @@ import imgMobile from "@/assets/images/program-mobile.png";
 import imgMaternal from "@/assets/images/program-maternal.png";
 import imgRelief from "@/assets/images/health-post.png";
 import { Pill, Stethoscope, Baby, LifeBuoy } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 
 const programs = [
   {
@@ -46,16 +47,18 @@ const programs = [
 ];
 
 export function Programs() {
+  const { t } = useLanguage();
+
   return (
     <section id="programs" className="py-24 bg-white">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="text-secondary font-bold tracking-wider uppercase text-sm mb-2 block">What We Do</span>
+          <span className="text-secondary font-bold tracking-wider uppercase text-sm mb-2 block">{t("What We Do")}</span>
           <h2 className="text-4xl md:text-5xl font-bold font-serif mb-6 text-primary">
-            Our Focus Areas: Direct Medical & Community Relief
+            {t("Our Focus Areas: Direct Medical & Community Relief")}
           </h2>
           <p className="text-lg text-muted-foreground">
-            Targeted interventions designed for sustainable local impact.
+            {t("Targeted interventions designed for sustainable local impact.")}
           </p>
         </div>
 
@@ -72,7 +75,7 @@ export function Programs() {
                 <div className="relative rounded-3xl overflow-hidden shadow-xl aspect-4/3">
                   <img 
                     src={program.image} 
-                    alt={program.title}
+                    alt={t(program.title)}
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 rounded-3xl ring-1 ring-inset ring-black/10 pointer-events-none"></div>
@@ -83,19 +86,19 @@ export function Programs() {
                 <div className={`w-14 h-14 rounded-2xl ${program.bgColor} ${program.color} flex items-center justify-center`}>
                   <program.icon size={28} />
                 </div>
-                <h3 className="text-3xl font-bold font-serif text-primary">{program.title}</h3>
+                <h3 className="text-3xl font-bold font-serif text-primary">{t(program.title)}</h3>
 
                 <div>
-                  <h4 className="text-sm font-bold uppercase tracking-wider text-foreground mb-2">Scope</h4>
+                  <h4 className="text-sm font-bold uppercase tracking-wider text-foreground mb-2">{t("Scope")}</h4>
                   <p className="text-lg text-muted-foreground leading-relaxed">
-                    {program.scope}
+                    {t(program.scope)}
                   </p>
                 </div>
 
                 <div className="rounded-2xl bg-primary/5 border border-primary/15 p-5">
-                  <h4 className="text-sm font-bold uppercase tracking-wider text-primary mb-2">Milestone Target</h4>
+                  <h4 className="text-sm font-bold uppercase tracking-wider text-primary mb-2">{t("Milestone Target")}</h4>
                   <p className="text-muted-foreground leading-relaxed">
-                    {program.milestone}
+                    {t(program.milestone)}
                   </p>
                 </div>
 
@@ -104,7 +107,7 @@ export function Programs() {
                     href="#donate" 
                     className="inline-flex items-center font-bold text-primary hover:text-secondary transition-colors group"
                   >
-                    Support this program
+                    {t("Support this program")}
                     <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
