@@ -1,35 +1,47 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Card, CardContent } from "@/components/ui/card";
 import imgMedicine from "@/assets/images/program-medicine.png";
 import imgMobile from "@/assets/images/program-mobile.png";
 import imgMaternal from "@/assets/images/program-maternal.png";
-import { Pill, Stethoscope, Baby } from "lucide-react";
+import imgRelief from "@/assets/images/health-post.png";
+import { Pill, Stethoscope, Baby, LifeBuoy } from "lucide-react";
 
 const programs = [
   {
-    title: "Medicines for Rural Families",
-    description: "Providing essential medicines to families without access to pharmacies. We deliver basic first-aid kits, maintenance medications, and acute care supplies directly to homes.",
-    image: imgMedicine,
-    icon: Pill,
-    color: "text-secondary",
-    bgColor: "bg-secondary/10"
-  },
-  {
-    title: "Mobile Doctor Visits",
-    description: "Bringing licensed physicians directly to remote barangays on scheduled rounds. Our mobile clinics offer consultations, basic diagnostics, and follow-up care.",
+    title: "Mobile Medical Missions (Outreach Clinics)",
+    scope: "Deploying volunteer doctors, nurses, and medical personnel to conduct diagnostic screenings, pediatric check-ups, and geriatric consultations directly in remote barangays.",
+    milestone: "Conduct 6 mobile outreach missions per year, providing direct medical consultations to 1,200+ rural residents in isolated sitios.",
     image: imgMobile,
     icon: Stethoscope,
     color: "text-primary",
     bgColor: "bg-primary/10"
   },
   {
-    title: "Child and Maternal Health",
-    description: "Prenatal care, immunizations, and nutrition support for mothers and children. Ensuring the next generation of Cagayan grows up strong and healthy.",
+    title: "Essential Medicine Dispensary & Chronic Care",
+    scope: "Supplying free prescription drugs, antibiotics, hypertension/diabetes maintenance medications, vitamins, and fever reducers to families unable to afford commercial pharmacy prices.",
+    milestone: "Establish a revolving medicine stockpile to support 800 chronic-care patients and distribute 500 emergency home medicine kits annually.",
+    image: imgMedicine,
+    icon: Pill,
+    color: "text-secondary",
+    bgColor: "bg-secondary/10"
+  },
+  {
+    title: "Maternal, Infant & Pediatric Care",
+    scope: "Providing prenatal care supplements (folic acid, iron), infant nutrition monitoring, pediatric deworming, and basic hygiene packages for mothers and newborns.",
+    milestone: "Support 250 expectant mothers with prenatal supplies and screen 600 young children for malnutrition and vitamin deficiencies.",
     image: imgMaternal,
     icon: Baby,
     color: "text-accent",
     bgColor: "bg-accent/10"
+  },
+  {
+    title: "Emergency Relief & First-Aid Preparedness",
+    scope: "Pre-positioning trauma and first-aid kits, water purification supplies, and emergency response kits with Barangay Health Workers (BHWs) ahead of typhoon landfall.",
+    milestone: "Train and equip 50 Barangay Health Workers across 10 vulnerable barangays with standardized emergency trauma and disaster-response kits.",
+    image: imgRelief,
+    icon: LifeBuoy,
+    color: "text-secondary",
+    bgColor: "bg-secondary/10"
   }
 ];
 
@@ -40,10 +52,10 @@ export function Programs() {
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="text-secondary font-bold tracking-wider uppercase text-sm mb-2 block">What We Do</span>
           <h2 className="text-4xl md:text-5xl font-bold font-serif mb-6 text-primary">
-            Our Featured Programs
+            Our Focus Areas: Direct Medical & Community Relief
           </h2>
           <p className="text-lg text-muted-foreground">
-            We focus on practical, immediate interventions that make a measurable difference in the daily lives of rural families.
+            Targeted interventions designed for sustainable local impact.
           </p>
         </div>
 
@@ -72,9 +84,21 @@ export function Programs() {
                   <program.icon size={28} />
                 </div>
                 <h3 className="text-3xl font-bold font-serif text-primary">{program.title}</h3>
-                <p className="text-lg text-muted-foreground leading-relaxed">
-                  {program.description}
-                </p>
+
+                <div>
+                  <h4 className="text-sm font-bold uppercase tracking-wider text-foreground mb-2">Scope</h4>
+                  <p className="text-lg text-muted-foreground leading-relaxed">
+                    {program.scope}
+                  </p>
+                </div>
+
+                <div className="rounded-2xl bg-primary/5 border border-primary/15 p-5">
+                  <h4 className="text-sm font-bold uppercase tracking-wider text-primary mb-2">Milestone Target</h4>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {program.milestone}
+                  </p>
+                </div>
+
                 <div className="pt-4">
                   <a 
                     href="#donate" 

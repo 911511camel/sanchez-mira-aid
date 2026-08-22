@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { MapPin, Mountain, Landmark, Church } from "lucide-react";
+import { MapPin, Mountain, Landmark, Church, Stethoscope, CloudRain, Waves, Trees } from "lucide-react";
 import landscapeImg from "@/assets/images/sanchez-mira-landscape.png";
 import villageImg from "@/assets/images/barangay-village.png";
 import gatheringImg from "@/assets/images/community-gathering.png";
@@ -171,6 +171,127 @@ export function SanchezMira() {
               />
             </motion.div>
           </div>
+        </div>
+
+        {/* Local crisis & geographic context */}
+        <div className="mb-16">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <motion.span
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              className="text-secondary font-bold tracking-wider uppercase text-sm mb-2 block"
+            >
+              The Local Crisis
+            </motion.span>
+            <motion.h3
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-3xl md:text-4xl font-bold font-serif mb-4 text-primary"
+            >
+              The Reality on the Ground: Distance, Climate, and Access
+            </motion.h3>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="text-lg text-muted-foreground leading-relaxed"
+            >
+              Why Sanchez Mira Faces Acute Healthcare Vulnerabilities
+            </motion.p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            {/* Distance to tertiary care */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="rounded-3xl bg-white border border-border p-8 shadow-sm"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-secondary/10 text-secondary flex items-center justify-center mb-5">
+                <Stethoscope size={24} />
+              </div>
+              <h4 className="text-xl font-bold font-serif text-primary mb-3">Distance to Tertiary Care</h4>
+              <p className="text-muted-foreground leading-relaxed">
+                Sanchez Mira relies on local Rural Health Units (RHUs) and district facilities for primary care.
+                However, for specialized interventions, major trauma, surgical procedures, or advanced diagnostics,
+                patients must travel to <strong className="text-foreground">Tuguegarao City</strong> (primarily the{" "}
+                <em>Cagayan Valley Medical Center</em>). This trip spans approximately{" "}
+                <strong className="text-foreground">150–160 kilometers</strong> and takes{" "}
+                <strong className="text-foreground">3.5 to 4.5 hours</strong> by road under normal conditions.
+              </p>
+            </motion.div>
+
+            {/* Typhoon & seasonal isolation */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="rounded-3xl bg-white border border-border p-8 shadow-sm"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-5">
+                <CloudRain size={24} />
+              </div>
+              <h4 className="text-xl font-bold font-serif text-primary mb-3">Typhoon & Seasonal Isolation</h4>
+              <p className="text-muted-foreground leading-relaxed">
+                Located along the northern coastline facing the Babuyan Channel, the municipality lies directly
+                in the path of seasonal Pacific typhoons (typically July to December). Heavy rains and storm surges
+                routinely cause flash flooding, swell river crossings, and trigger coastal road cut-offs along the
+                Manila North Road corridor, isolating communities for days at a time.
+              </p>
+            </motion.div>
+          </div>
+
+          {/* Vulnerable & remote barangays */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-3xl bg-white border border-border p-8 shadow-sm"
+          >
+            <div className="flex items-start gap-4 mb-6">
+              <div className="w-12 h-12 rounded-2xl bg-accent/10 text-accent flex items-center justify-center shrink-0">
+                <MapPin size={24} />
+              </div>
+              <div>
+                <h4 className="text-xl font-bold font-serif text-primary mb-1">Vulnerable & Remote Barangays</h4>
+                <p className="text-sm text-muted-foreground">Communities most at risk when disaster strikes</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="rounded-2xl bg-muted/40 border border-border p-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <Waves size={18} className="text-secondary shrink-0" />
+                  <h5 className="font-bold text-foreground">Coastal Fisherfolk Communities</h5>
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+                  <span className="font-semibold text-foreground">e.g., Masisit, Bangan, Tokitok</span> — high
+                  exposure to storm surges, wind damage, and chronic seasonal loss of income during rough seas.
+                </p>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Basic waterborne and respiratory illnesses spike during monsoon months.
+                </p>
+              </div>
+              <div className="rounded-2xl bg-muted/40 border border-border p-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <Trees size={18} className="text-primary shrink-0" />
+                  <h5 className="font-bold text-foreground">Inland & Upland Farming Settlements</h5>
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+                  <span className="font-semibold text-foreground">e.g., Callungan, Kitturong, Dammang</span> —
+                  dispersed sitios and puroks face unpaved access routes that become impassable during typhoons.
+                </p>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Cutting off access even to the municipal town center.
+                </p>
+              </div>
+            </div>
+          </motion.div>
         </div>
 
         {/* Bottom callout */}
