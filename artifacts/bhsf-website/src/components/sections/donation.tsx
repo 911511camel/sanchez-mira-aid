@@ -11,9 +11,13 @@ import {
   Loader2,
   Smartphone,
   Bitcoin,
+  Copy,
+  CheckCircle,
 } from "lucide-react";
 
 type PaymentMethod = "gcash" | "crypto";
+
+const GCASH_NUMBER = "09175320080";
 
 const donationTiers = [
   { amount: 250, impact: "Provides a month of vitamins for one child" },
@@ -30,12 +34,21 @@ function DonationForm({ paymentMethod }: { paymentMethod: PaymentMethod }) {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const amountPhp = selectedAmount === "custom" ? Number(customAmount) : selectedAmount;
   const currentImpact =
     selectedAmount === "custom"
       ? "Every contribution brings healthcare closer to those who need it."
       : donationTiers.find((t) => t.amount === selectedAmount)?.impact;
+
+  const copyGcashNumber = async () => {
+    try {
+      await navigator.clipboard.writeText(GCASH_NUMBER);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 3000);
+    } catch { /* ignore */ }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -149,6 +162,46 @@ function DonationForm({ paymentMethod }: { paymentMethod: PaymentMethod }) {
         )}
       </div>
 
+      {paymentMethod === "gcash" && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="p-5 rounded-2xl bg-secondary/10 border border-secondary/20"
+          data-testid="gcash-details"
+        >
+          <Label className="text-lg font-bold text-secondary block mb-1">
+            Pay via GCash
+          </Label>
+          <p className="text-sm text-muted-foreground mb-3">
+            Send your donation to this GCash number:
+          </p>
+          <div className="flex items-center justify-between gap-3 rounded-xl bg-white border border-border px-5 py-4">
+            <div>
+              <p className="text-xs text-muted-foreground mb-0.5">GCash Number</p>
+              <p className="font-mono text-2xl font-bold text-foreground tracking-wider">
+                {GCASH_NUMBER}
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={copyGcashNumber}
+              className="gap-2 rounded-xl shrink-0"
+            >
+              {copied ? (
+                <><CheckCircle size={14} className="text-green-600" /><span className="text-green-600">Copied</span></>
+              ) : (
+                <><Copy size={14} />Copy</>
+              )}
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground mt-3">
+            After sending, complete the form below and submit to confirm your donation.
+          </p>
+        </motion.div>
+      )}
+
       <div className="space-y-4">
         <Label className="text-lg font-bold text-primary block">Your Details</Label>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -211,7 +264,7 @@ function DonationForm({ paymentMethod }: { paymentMethod: PaymentMethod }) {
       </Button>
 
       <p className="text-xs text-center text-muted-foreground">
-        {paymentMethod === "gcash" && "Redirects to a secure GCash checkout via HitPay. Pay directly from your GCash app."}
+        {paymentMethod === "gcash" && `Donate to GCash ${GCASH_NUMBER}, then complete the form below to confirm.`}
         {paymentMethod === "crypto" && "Redirects to NOWPayments secure checkout. Pay with Bitcoin, Ethereum, USDT, USDC, and 100+ other cryptocurrencies."}
       </p>
     </motion.form>

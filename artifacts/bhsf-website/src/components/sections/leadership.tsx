@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Stethoscope, Landmark, HeartPulse, GraduationCap } from "lucide-react";
+import drPhoto from "@/assets/images/dr-sacramed.jpg";
 
 const details = [
   {
@@ -64,9 +65,11 @@ export function Leadership() {
           className="max-w-4xl mx-auto bg-white border border-border rounded-3xl shadow-xl overflow-hidden"
         >
           <div className="bg-primary text-primary-foreground p-8 md:p-10 flex flex-col md:flex-row items-center gap-6">
-            <div className="w-24 h-24 rounded-full bg-white/15 border-2 border-white/30 flex items-center justify-center text-white font-serif font-bold text-3xl shrink-0">
-              CS
-            </div>
+            <img
+              src={drPhoto}
+              alt="Dr. Connie Marie Oroceo-Sacramed"
+              className="w-28 h-28 rounded-full object-cover border-4 border-white/30 shrink-0 shadow-lg"
+            />
             <div className="text-center md:text-left">
               <h3 className="text-2xl md:text-3xl font-bold font-serif mb-1">
                 Dr. Connie Marie Oroceo-Sacramed
