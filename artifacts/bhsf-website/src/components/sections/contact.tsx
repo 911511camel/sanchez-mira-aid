@@ -46,7 +46,7 @@ export function Contact() {
             
             <div className="mt-12 pt-8 border-t border-white/20">
               <p className="text-sm text-primary-foreground/60 mb-1">Direct contact:</p>
-              <p className="font-bold text-white">Vice Mayor Connie Marie Sacramed</p>
+              <p className="font-bold text-white">Dr. Connie Marie Oroceo-Sacramed</p>
               <p className="text-sm text-primary-foreground/80">Vice Mayor & Fund Coordinator</p>
             </div>
           </div>

@@ -6,6 +6,7 @@ import { Mission } from "@/components/sections/mission";
 import { SanchezMira } from "@/components/sections/sanchez-mira";
 import { Programs } from "@/components/sections/programs";
 import { Impact } from "@/components/sections/impact";
+import { Leadership } from "@/components/sections/leadership";
 import { Donation } from "@/components/sections/donation";
 import { Contact } from "@/components/sections/contact";
 
@@ -19,6 +20,7 @@ export default function Home() {
         <SanchezMira />
         <Programs />
         <Impact />
+        <Leadership />
         <Donation />
         <Contact />
       </main>

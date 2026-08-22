@@ -51,7 +51,7 @@ export function Footer() {
               </li>
               <li className="pt-2">
                 <span className="block text-sm opacity-60 mb-1">Vice Mayor & Fund Coordinator</span>
-                <span className="font-medium text-white">Vice Mayor Connie Marie Sacramed</span>
+                <span className="font-medium text-white">Dr. Connie Marie Oroceo-Sacramed</span>
               </li>
             </ul>
           </div>
