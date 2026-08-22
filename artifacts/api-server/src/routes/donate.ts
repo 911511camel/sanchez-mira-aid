@@ -176,7 +176,7 @@ router.post("/donate", async (req, res) => {
   }
 
   try {
-    if (paymentMethod === "fiat") {
+    if (paymentMethod === "gcash") {
       await handleFiatDonation(req, res, amountPhp, firstName.trim(), lastName.trim(), email);
     } else if (paymentMethod === "crypto") {
       await handleCryptoDonation(req, res, amountPhp, firstName.trim(), lastName.trim(), email);
