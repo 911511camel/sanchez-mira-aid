@@ -383,7 +383,7 @@ export function Donation() {
             </h2>
             <p className="text-lg text-muted-foreground mb-8">
               Your generosity directly translates to medicines, doctor visits, and
-              better health for families in Santo Tomas. Every peso is stretched to
+              better health for families in Sanchez Mira. Every peso is stretched to
               maximize impact in the barangays.
             </p>
 

@@ -19,7 +19,7 @@ export function Contact() {
                 </div>
                 <div>
                   <h4 className="font-bold text-white mb-1">Office</h4>
-                  <p className="text-primary-foreground/80">Santo Tomas<br />Isabela, Philippines</p>
+                  <p className="text-primary-foreground/80">Sanchez Mira<br />Cagayan, Philippines</p>
                 </div>
               </div>
               
@@ -46,8 +46,8 @@ export function Contact() {
             
             <div className="mt-12 pt-8 border-t border-white/20">
               <p className="text-sm text-primary-foreground/60 mb-1">Direct contact:</p>
-              <p className="font-bold text-white">Maria Santos</p>
-              <p className="text-sm text-primary-foreground/80">Fund Coordinator</p>
+              <p className="font-bold text-white">Vice Mayor Connie Marie Sacramed</p>
+              <p className="text-sm text-primary-foreground/80">Vice Mayor & Fund Coordinator</p>
             </div>
           </div>
           

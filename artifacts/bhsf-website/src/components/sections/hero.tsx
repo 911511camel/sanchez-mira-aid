@@ -33,7 +33,7 @@ export function Hero() {
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/20 border border-accent/30 text-accent font-medium text-sm mb-6 backdrop-blur-sm"
           >
             <HeartHandshake size={16} />
-            <span>Santo Tomas, Isabela</span>
+            <span>Sanchez Mira, Cagayan</span>
           </motion.div>
           
           <motion.h1 

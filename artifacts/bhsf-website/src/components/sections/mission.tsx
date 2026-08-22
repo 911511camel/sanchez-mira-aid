@@ -26,7 +26,7 @@ export function Mission() {
             transition={{ delay: 0.1 }}
             className="text-xl md:text-2xl text-muted-foreground font-serif italic leading-relaxed"
           >
-            "To improve healthcare access and quality of life in rural barangays of Santo Tomas, Isabela, Philippines."
+            "To improve healthcare access and quality of life in rural barangays of Sanchez Mira, Cagayan, Philippines."
           </motion.p>
         </div>
 

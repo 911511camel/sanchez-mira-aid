@@ -21,7 +21,7 @@ export default function ThankYou() {
         <p className="text-lg text-muted-foreground mb-8">
           Your donation is being processed. Once confirmed, it will go directly
           toward medicines, mobile doctor visits, and maternal health programs in
-          Santo Tomas, Isabela. You will receive a confirmation email shortly.
+          Sanchez Mira, Cagayan. You will receive a confirmation email shortly.
         </p>
         <div className="p-5 rounded-2xl bg-secondary/10 border border-secondary/20 mb-8">
           <p className="text-sm font-medium text-secondary">

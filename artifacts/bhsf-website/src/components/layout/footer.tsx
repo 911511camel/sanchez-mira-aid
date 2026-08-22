@@ -20,7 +20,7 @@ export function Footer() {
               "Better Health for Every Barangay"
             </p>
             <p className="text-primary-foreground/70 max-w-md">
-              A humanitarian fund dedicated to improving healthcare access in rural barangays of Santo Tomas, Isabela, Philippines.
+              A humanitarian fund dedicated to improving healthcare access in rural barangays of Sanchez Mira, Cagayan, Philippines.
             </p>
           </div>
           
@@ -39,7 +39,7 @@ export function Footer() {
             <ul className="space-y-4 text-primary-foreground/80">
               <li className="flex items-start gap-3">
                 <MapPin size={20} className="shrink-0 mt-1" />
-                <span>Santo Tomas, Isabela, Philippines</span>
+                <span>Sanchez Mira, Cagayan, Philippines</span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone size={20} className="shrink-0" />
@@ -50,8 +50,8 @@ export function Footer() {
                 <span>info@bhsf.org.ph</span>
               </li>
               <li className="pt-2">
-                <span className="block text-sm opacity-60 mb-1">Fund Coordinator</span>
-                <span className="font-medium text-white">Maria Santos</span>
+                <span className="block text-sm opacity-60 mb-1">Vice Mayor & Fund Coordinator</span>
+                <span className="font-medium text-white">Vice Mayor Connie Marie Sacramed</span>
               </li>
             </ul>
           </div>

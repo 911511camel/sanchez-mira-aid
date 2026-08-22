@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { MapPin, Mountain, Wheat, Clock } from "lucide-react";
-import landscapeImg from "@/assets/images/santo-tomas-landscape.png";
+import { MapPin, Mountain, Landmark, Church } from "lucide-react";
+import landscapeImg from "@/assets/images/sanchez-mira-landscape.png";
 import villageImg from "@/assets/images/barangay-village.png";
 import gatheringImg from "@/assets/images/community-gathering.png";
 import healthPostImg from "@/assets/images/health-post.png";
@@ -10,26 +10,26 @@ const facts = [
   {
     icon: MapPin,
     label: "Location",
-    value: "Cagayan Valley Region, Isabela Province — 400 km north of Manila",
+    value: "Cagayan Valley (Region II), Cagayan Province — approx. 632 km from Manila",
   },
   {
     icon: Mountain,
     label: "Geography",
-    value: "Surrounded by the Sierra Madre mountain range; rivers and seasonal flooding isolate many barangays",
+    value: "A 3rd-class coastal municipality covering 218.77 km², with 18 barangays spread across coastal plains and upland areas",
   },
   {
-    icon: Wheat,
-    label: "Livelihood",
-    value: "Primarily subsistence rice farming — seasonal income leaves little room for medical expenses",
+    icon: Landmark,
+    label: "History",
+    value: "Originally a Kalinga hunting ground and Spanish mission area before Ilocos settlers arrived to farm; formerly called Malolokit, officially founded and named in 1884 after Spanish Brigadier General Manuel Sanchez Mira",
   },
   {
-    icon: Clock,
-    label: "Healthcare Access",
-    value: "Nearest hospital is 30–60 minutes away by road; many remote barangays have no paved access",
+    icon: Church,
+    label: "Heritage",
+    value: "Home to the historic Santa Maria Magdalena Church ruins (also known as Pata or Nagsimbaanan Church), dating back to 1595",
   },
 ];
 
-export function SantoTomas() {
+export function SanchezMira() {
   return (
     <section id="community" className="py-24 bg-muted/30">
       <div className="container mx-auto px-4 md:px-6">
@@ -50,7 +50,7 @@ export function SantoTomas() {
             viewport={{ once: true }}
             className="text-4xl md:text-5xl font-bold font-serif mb-6 text-primary"
           >
-            Santo Tomas, Isabela
+            Sanchez Mira, Cagayan
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -59,9 +59,11 @@ export function SantoTomas() {
             transition={{ delay: 0.1 }}
             className="text-lg text-muted-foreground leading-relaxed"
           >
-            Nestled in the fertile Cagayan Valley, Santo Tomas is a municipality of hardworking farming families, 
-            quiet rivers, and green mountains. Its people are resilient and proud — but geographic isolation and 
-            poverty mean that basic healthcare is often out of reach for the families who need it most.
+            Sanchez Mira is a 3rd-class coastal municipality in the province of Cagayan, Philippines.
+            It covers 218.77 square kilometers and has a population of over 26,000 people. Formerly
+            called Malolokit, it was named after Spanish Brigadier General Manuel Sanchez Mira.
+            Its people are resilient and proud — but geographic isolation and poverty mean that
+            basic healthcare is often out of reach for the families who need it most.
           </motion.p>
         </div>
 
@@ -74,12 +76,12 @@ export function SantoTomas() {
         >
           <img
             src={landscapeImg}
-            alt="Rice paddies and mountains of Cagayan Valley, Isabela, Philippines"
+            alt="Coastal landscape of Cagayan Valley, Philippines"
             className="w-full h-[420px] object-cover"
           />
           <div className="bg-primary/90 text-white text-sm px-6 py-3 flex items-center gap-2">
             <MapPin size={14} className="shrink-0" />
-            Cagayan Valley rice paddies with the Sierra Madre range in the background — the landscape of Santo Tomas, Isabela
+            The coastal municipality of Sanchez Mira, Cagayan — the landscape we serve
           </div>
         </motion.div>
 
@@ -122,7 +124,7 @@ export function SantoTomas() {
               "When my daughter had a high fever, the nearest clinic was a one-hour tricycle ride on a muddy road. 
               By the time we arrived, it was dark and the doctor had already left."
               <footer className="mt-3 text-sm not-italic font-medium text-foreground">
-                — Barangay resident, Santo Tomas
+                — Barangay resident, Sanchez Mira
               </footer>
             </motion.blockquote>
           </div>
@@ -138,7 +140,7 @@ export function SantoTomas() {
             >
               <img
                 src={villageImg}
-                alt="Rural barangay village in Santo Tomas, Isabela"
+                alt="Rural barangay village in Sanchez Mira, Cagayan"
                 className="w-full h-52 object-cover"
               />
             </motion.div>
@@ -179,9 +181,12 @@ export function SantoTomas() {
           className="max-w-4xl mx-auto bg-white border border-border rounded-3xl p-8 md:p-10 text-center shadow-sm"
         >
           <p className="text-lg text-muted-foreground leading-relaxed mb-4">
-            Santo Tomas has approximately <strong className="text-foreground">15 barangays</strong> spread across 
-            river plains and upland areas. Many families live on less than ₱300 per day — meaning even a single 
-            doctor's visit, a bag of vitamins, or a course of antibiotics can be financially out of reach.
+            Sanchez Mira has approximately <strong className="text-foreground">18 barangays</strong> and a
+            population of over <strong className="text-foreground">26,000 people</strong>, located about
+            <strong className="text-foreground"> 632 km from Manila</strong> and{" "}
+            <strong className="text-foreground">155 km from Tuguegarao</strong>. Many families live on less
+            than ₱300 per day — meaning even a single doctor's visit, a bag of vitamins, or a course of
+            antibiotics can be financially out of reach.
           </p>
           <p className="text-lg text-muted-foreground leading-relaxed">
             The Barangay Health Support Fund was founded to close this gap — not through charity, 

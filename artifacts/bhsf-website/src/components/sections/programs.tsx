@@ -25,7 +25,7 @@ const programs = [
   },
   {
     title: "Child and Maternal Health",
-    description: "Prenatal care, immunizations, and nutrition support for mothers and children. Ensuring the next generation of Isabela grows up strong and healthy.",
+    description: "Prenatal care, immunizations, and nutrition support for mothers and children. Ensuring the next generation of Cagayan grows up strong and healthy.",
     image: imgMaternal,
     icon: Baby,
     color: "text-accent",
