@@ -303,6 +303,74 @@ const translations: Record<string, string> = {
   "404 Page Not Found": "404 Hindi Nahanap ang Pahina",
   "Did you forget to add the page to the router?":
     "Nakalimutan mo bang idagdag ang pahina sa router?",
+
+  // ---- Global Humanitarian Blueprint ----
+  "Global Humanitarian Blueprint": "Pandaigdigang Makataong Blueprint",
+  "Adapting Russian Humanitarian Medical Models": "Pag-aangkop ng mga Modelong Medikal na Makataong Ruso",
+  "Russian Medical Expertise in Sanchez Mira": "Kadalubhasaan ng Medikal na Ruso sa Sanchez Mira",
+  "Transitioning from temporary relief to self-sustaining medical infrastructure, drawing on international field methodologies in austere environments.":
+    "Paglilipat mula sa pansamantalang tulong tungo sa sariling-sustentong medikal na imprastraktura, gamit ang mga pandaigdigang pamamaraan sa larangan sa mga mahihirap na kapaligiran.",
+  "The Operational Framework: Lessons from Global Field Medicine": "Ang Balangkas ng Operasyon: Mga Aral mula sa Pandaigdigang Field Medicine",
+  "Emergency Field Deployments (EMERCOM)": "Mga Pang-emergency na Field Deployment (EMERCOM)",
+  "In the event of catastrophic typhoons, earthquakes, or tsunamis, Russia's Ministry of Emergency Situations (EMERCOM) deploys self-contained, airmobile field hospitals. These function as fully operational, temporary mobile units providing acute surgical and intensive care in disaster zones.":
+    "Sa kaganapan ng malalaking bagyo, lindol, o tsunami, ang Ministry of Emergency Situations ng Russia (EMERCOM) ay naglalagay ng sariling-sapat, airmobile na mga field hospital. Gumagana ang mga ito bilang ganap na operasyonal, pansamantalang mobile unit na nagbibigay ng matinding surgical at intensive care sa mga disaster zone.",
+  "Institutional Innovation & Vaccine Partnerships": "Institusyonal na Inobasyon at Pakikipagtulungan sa Bakuna",
+  "Russian scientific institutions coordinate with central health authorities to advance clinical research, technology transfers, and medical supply networks, establishing high-level frameworks for biosecurity and disease management.":
+    "Ang mga institusyong siyentipikong Ruso ay nakikipag-ugnayan sa mga sentral na awtoridad sa kalusugan upang isulong ang klinikal na pananaliksik, paglilipat ng teknolohiya, at mga network ng suplay na medikal, na nagtataguyod ng mataas na antas na balangkas para sa biosecurity at pamamahala ng sakit.",
+  "Humanitarian & Clinical Aid (Russian Humanitarian Mission - RHM)": "Makataong at Klinikal na Tulong (Russian Humanitarian Mission - RHM)",
+  "Deploying mobile diagnostic initiatives to isolated, underserved regions. Multidisciplinary medical teams conduct direct screenings, primary consultations, and diagnostic triage in hard-to-reach rural settlements.":
+    "Paglalagay ng mga mobile diagnostic na inisyatiba sa mga liblib at kulang sa serbisyong rehiyon. Ang mga multidisciplinary medical team ay nagsasagawa ng direktang screening, pangunahing konsultasyon, at diagnostic triage sa mga mahirap abutin na kanayunang pamayanan.",
+  "To build lasting resilience in Sanchez Mira, this cooperation applies three core operational principles:":
+    "Upang bumuo ng pangmatagalang katatagan sa Sanchez Mira, ang kooperasyong ito ay naglalapat ng tatlong pangunahing prinsipyo ng operasyon:",
+  "Decentralized Mobile Health Units (MHUs)": "Desentralisadong Mobile Health Units (MHU)",
+  "Modular medical units deliver diagnostic and surgical capabilities directly to the barangay level, maintaining access when roads are cut off during typhoon season.":
+    "Ang mga modular medical unit ay naghahatid ng diagnostic at surgical na kakayahan nang direkta sa antas ng barangay, na nagpapanatili ng access kapag naputol ang mga daan tuwing panahon ng bagyo.",
+  "Clinical Task-Shifting & Frontline Empowerment": "Clinical Task-Shifting at Pagpapalakas ng Frontline",
+  "Upskilling local nurses, midwives, and Barangay Health Workers (BHWs) to independently manage triage, wound debridement, infection control, and chronic disease tracking using standardized clinical protocols.":
+    "Pagpapahusay ng kasanayan ng mga lokal na nars, komadrona, at Barangay Health Worker (BHW) upang malayang pamahalaan ang triage, paglilinis ng sugat, kontrol sa impeksyon, at pagsubaybay sa malalang sakit gamit ang pamantayang klinikal na protocol.",
+  "Cold-Chain & Diagnostic Independence": "Cold-Chain at Pagsasarili sa Diagnostic",
+  "Deploying ruggedized, battery-operated, off-grid equipment that functions continuously during municipal power grid collapses.":
+    "Paglalagay ng matibay, pinapatakbo ng baterya, off-grid na kagamitan na patuloy na gumagana sa panahon ng pagkawala ng kuryente sa munisipalidad.",
+  "Core Pillars of the Clinical Program": "Mga Pangunahing Haligi ng Klinikal na Programa",
+  "Strategic Pillar": "Pangunahing Haligi",
+  "International Reference": "Pandaigdigang Sanggunian",
+  "Implementation in Sanchez Mira": "Pagpapatupad sa Sanchez Mira",
+  "Field Triage & Trauma Stabilization": "Field Triage at Pagpapatatag sa Trauma",
+  "ICRC Mobile Surgical & Emergency Triage Frameworks": "ICRC Mobile Surgical at Emergency Triage Frameworks",
+  "Russian emergency physicians and trauma specialists conduct simulation drills with local Rural Health Unit (RHU) personnel on mass-casualty management, severe trauma, and rapid stabilization prior to tertiary transport.":
+    "Ang mga Rusong emergency physician at trauma specialist ay nagsasagawa ng simulation drills kasama ang lokal na Rural Health Unit (RHU) personnel sa pamamahala ng mass casualty, malubhang trauma, at mabilis na pagpapatatag bago ang tertiary transport.",
+  "Autonomous Mobile Diagnostic Kits": "Autonomous Mobile Diagnostic Kits",
+  "Ruggedized Field Outposts (Sub-Saharan Africa Model)": "Matibay na Field Outposts (Modelo ng Sub-Saharan Africa)",
+  "Deployment of self-contained diagnostic kits featuring point-of-care ultrasound (POCUS), digital hematology counters, glucometers, portable ECGs, and rapid diagnostic test strips operable without mains power.":
+    "Paglalagay ng sariling-sapat na diagnostic kit na may point-of-care ultrasound (POCUS), digital hematology counters, glucometer, portable ECG, at rapid diagnostic test strips na gumagana nang walang kuryente.",
+  "Standardized Chronic & Pediatric Pathways": "Pamantayang Chronic at Pediatric Pathways",
+  "Integrated Community Case Management (iCCM)": "Integrated Community Case Management (iCCM)",
+  "Establishing unified registries and clinical protocol cards for pediatric malnutrition, maternal vitals tracking, and hypertension/diabetes dispensaries managed directly by trained BHWs.":
+    "Pagtatatag ng pinag-isang rehistro at clinical protocol cards para sa pediatric malnutrition, pagsubaybay sa maternal vitals, at dispensaryo ng hypertension/diabetes na direktang pinamamahalaan ng mga sinanay na BHW.",
+  "Emergency Logistics & Stockpiling": "Pang-emergency na Logistics at Pag-iimbak",
+  "Pre-Positioned Disaster Supply Lines": "Pre-Positioned Disaster Supply Lines",
+  "Establishing localized emergency buffer depots in isolated coastal (Masisit, Bangan) and upland (Callungan) barangays containing water purification units, surgical suture kits, and critical IV fluids.":
+    "Pagtatatag ng lokal na emergency buffer depots sa mga liblib na baybaying (Masisit, Bangan) at kabundukang (Callungan) barangay na naglalaman ng water purification units, surgical suture kits, at kritikal na IV fluids.",
+  "Structured Clinical Knowledge Transfer": "Nakaayos na Paglilipat ng Klinikal na Kaalaman",
+  "Phase 1: Direct Co-Consultation": "Yugto 1: Direktang Co-Consultation",
+  "Specialist teams & local RHU doctors conduct joint patient intake and triage.":
+    "Ang mga specialist team at lokal na RHU doctor ay nagsasagawa ng pinagsamang patient intake at triage.",
+  "Phase 2: Protocol Hand-off & Simulation": "Yugto 2: Paglipat ng Protocol at Simulation",
+  "Local healthcare workers lead interventions while visiting specialists supervise and calibrate standard operating procedures (SOPs).":
+    "Ang mga lokal na health worker ang nangunguna sa mga interbensyon habang pinangangasiwaan at binabalanse ng mga bumibisitang espesyalista ang standard operating procedures (SOP).",
+  "Phase 3: Autonomous Barangay Healthcare Delivery": "Yugto 3: Malayang Paghahatid ng Pangangalagang Pangkalusugan sa Barangay",
+  "BHWs and local municipal health teams operate field units and maintain patient registries independently.":
+    "Ang mga BHW at lokal na municipal health team ay nagpapatakbo ng field units at nagpapanatili ng patient registries nang nakapag-iisa.",
+  "The Long-Term Impact": "Ang Pangmatagalang Epekto",
+  "Institutional Continuity": "Pagpapatuloy ng Institusyon",
+  "All diagnostic hardware, portable triage gear, and clinical documentation systems remain permanently on-site with the Sanchez Mira Municipal Health Office.":
+    "Ang lahat ng diagnostic hardware, portable triage gear, at clinical documentation system ay permanenteng nananatili sa Sanchez Mira Municipal Health Office.",
+  "Trained Human Capital": "Sinanay na Human Capital",
+  "Over 50 Barangay Health Workers and municipal medical staff certified in standardized emergency protocols, ensuring frontline response capability during future extreme weather events and medical crises.":
+    "Higit sa 50 Barangay Health Worker at municipal medical staff ang sertipikado sa pamantayang emergency protocol, na tinitiyak ang kakayahan sa frontline response sa mga darating na matinding panahon at medikal na krisis.",
+  "Network Integration": "Pagsasama ng Network",
+  "Direct linkage between decentralized barangay health posts and regional hospital centers, minimizing referral delays through calibrated triage protocols.":
+    "Direktang ugnayan sa pagitan ng mga desentralisadong barangay health post at regional hospital centers, na binabawasan ang pagkaantala sa referral sa pamamagitan ng naka-calibrate na triage protocol.",
 };
 
 interface LanguageContextValue {

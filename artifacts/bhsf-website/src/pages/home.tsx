@@ -7,6 +7,7 @@ import { SanchezMira } from "@/components/sections/sanchez-mira";
 import { Programs } from "@/components/sections/programs";
 import { Impact } from "@/components/sections/impact";
 import { Leadership } from "@/components/sections/leadership";
+import { Blueprint } from "@/components/sections/blueprint";
 import { Volunteer } from "@/components/sections/volunteer";
 import { Donation } from "@/components/sections/donation";
 import { Contact } from "@/components/sections/contact";
@@ -22,6 +23,7 @@ export default function Home() {
         <Programs />
         <Impact />
         <Leadership />
+        <Blueprint />
         <Volunteer />
         <Donation />
         <Contact />
