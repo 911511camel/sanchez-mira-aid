@@ -31,6 +31,8 @@ export function Navbar() {
     }
   };
 
+  const nextLanguageLabel = lang === "en" ? "Tagalog" : lang === "tl" ? "Русский" : "English";
+
   return (
     <motion.header
       style={{ backgroundColor, backdropFilter, boxShadow }}
@@ -62,7 +64,7 @@ export function Navbar() {
             aria-label="Switch language"
           >
             <Languages size={16} />
-            {lang === "en" ? "Tagalog" : "English"}
+            {nextLanguageLabel}
           </Button>
           <Button onClick={scrollToDonate} size="lg" className="rounded-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold shadow-md">
             {t("Donate Now")}
