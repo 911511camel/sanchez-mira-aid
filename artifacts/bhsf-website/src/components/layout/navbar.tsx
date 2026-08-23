@@ -1,13 +1,19 @@
 import React from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { HeartPulse, Languages } from "lucide-react";
+import { HeartPulse } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useLanguage } from "@/lib/i18n";
 
+const languages = [
+  { code: "en" as const, label: "EN", flag: "https://flagcdn.com/w20/us.png", name: "English" },
+  { code: "tl" as const, label: "TG", flag: "https://flagcdn.com/w20/ph.png", name: "Tagalog" },
+  { code: "ru" as const, label: "RU", flag: "https://flagcdn.com/w20/ru.png", name: "Русский" },
+];
+
 export function Navbar() {
   const { scrollY } = useScroll();
-  const { t, lang, toggle } = useLanguage();
+  const { t, lang, setLang } = useLanguage();
   const backgroundColor = useTransform(
     scrollY,
     [0, 50],
@@ -30,8 +36,6 @@ export function Navbar() {
       el.scrollIntoView({ behavior: "smooth" });
     }
   };
-
-  const nextLanguageLabel = lang === "en" ? "Tagalog" : lang === "tl" ? "Русский" : "English";
 
   return (
     <motion.header
@@ -56,16 +60,32 @@ export function Navbar() {
         </nav>
         
         <div className="flex items-center gap-3">
-          <Button
-            onClick={toggle}
-            size="sm"
-            variant="outline"
-            className="rounded-full gap-2 text-sm"
-            aria-label="Switch language"
-          >
-            <Languages size={16} />
-            {nextLanguageLabel}
-          </Button>
+          <div className="flex items-center gap-0.5 rounded-full border border-border bg-muted/40 p-1">
+            {languages.map((item) => (
+              <button
+                key={item.code}
+                type="button"
+                onClick={() => setLang(item.code)}
+                aria-label={item.name}
+                title={item.name}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                  lang === item.code
+                    ? "bg-white shadow text-primary border border-border"
+                    : "text-muted-foreground hover:text-primary"
+                }`}
+              >
+                <img
+                  src={item.flag}
+                  alt={item.name}
+                  width={18}
+                  height={12}
+                  className="rounded-sm object-cover"
+                  loading="lazy"
+                />
+                {item.label}
+              </button>
+            ))}
+          </div>
           <Button onClick={scrollToDonate} size="lg" className="rounded-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold shadow-md">
             {t("Donate Now")}
           </Button>
